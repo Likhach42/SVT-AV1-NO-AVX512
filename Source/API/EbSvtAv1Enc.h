@@ -781,7 +781,6 @@ typedef struct EbSvtAv1EncConfiguration {
 
     // Threads management
 
-#if CLN_LP_LVLS
 #if !SVT_AV1_CHECK_VERSION(3, 0, 0)
     /* logical_processors refers to how much parallelization the encoder will perform
      * by setting the number of threads and pictures that can be handled simultaneously. If
@@ -805,20 +804,6 @@ typedef struct EbSvtAv1EncConfiguration {
      * N: Pin threads to socket's first N processors
      * default 0 */
     uint32_t pin_threads;
-#else
-    /* The number of logical processor which encoder threads run on. If
-     * LogicalProcessors and TargetSocket are not set, threads are managed by
-     * OS thread scheduler. */
-    uint32_t logical_processors;
-
-    /* Unpin the execution .This option does not
-    * set the execution to be pinned to a specific number of cores when set to 1. this allows the execution
-    * of multiple encodes on the CPU without having to pin them to a specific mask
-    * 1: pinned threads
-    * 0: unpinned
-    * default 0 */
-    uint32_t pin_threads;
-#endif
 
     /* Target socket to run on. For dual socket systems, this can specify which
      * socket the encoder runs on.
@@ -980,41 +965,18 @@ typedef struct EbSvtAv1EncConfiguration {
      *  Default is 6 */
     uint8_t variance_octile;
 
-#if FTR_LOSSLESS_SUPPORT
     /* @brief Signal to the library to enable losless coding
      *
      * Default is false.
      */
     Bool lossless;
-#if FTR_STILL_PICTURE
     /* @brief Signal to the library to enable still-picture coding
      *
      * Default is false.
      */
     Bool avif;
-#endif
     /*Add 128 Byte Padding to Struct to avoid changing the size of the public configuration struct*/
-#if CLN_LP_LVLS
-#if FTR_STILL_PICTURE
     uint8_t padding[128 - 3 * sizeof(Bool) - 2 * sizeof(uint8_t) - sizeof(uint32_t)];
-#else
-    uint8_t padding[128 - 2 * sizeof(Bool) - 2 * sizeof(uint8_t) - sizeof(uint32_t)];
-#endif
-#else
-#if FTR_STILL_PICTURE
-    uint8_t padding[128 - 3 * sizeof(Bool) - 2 * sizeof(uint8_t)];
-#else
-    uint8_t padding[128 - 2 * sizeof(Bool) - 2 * sizeof(uint8_t)];
-#endif
-#endif
-#else
-    /*Add 128 Byte Padding to Struct to avoid changing the size of the public configuration struct*/
-#if CLN_LP_LVLS
-    uint8_t padding[128 - sizeof(Bool) - 2 * sizeof(uint8_t) - sizeof(uint32_t)];
-#else
-    uint8_t padding[128 - sizeof(Bool) - 2 * sizeof(uint8_t)];
-#endif
-#endif
 } EbSvtAv1EncConfiguration;
 
 /**

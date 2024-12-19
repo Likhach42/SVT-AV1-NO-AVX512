@@ -322,13 +322,6 @@ EbErrorType svt_av1_verify_settings(SequenceControlSet *scs) {
     } else if ((config->min_qp_allowed) > (config->max_qp_allowed)) {
         SVT_ERROR("Instance %u:  MinQpAllowed must be smaller than MaxQpAllowed\n", channel_number + 1);
         return_error = EB_ErrorBadParameter;
-#if !FTR_LOSSLESS_SUPPORT
-    } else if ((config->min_qp_allowed) == 0) {
-        SVT_ERROR("Instance %u: MinQpAllowed must be [1 - %d]. Lossless coding not supported\n",
-                  channel_number + 1,
-                  MAX_QP_VALUE - 1);
-        return_error = EB_ErrorBadParameter;
-#endif
     }
     if (config->use_qp_file > 1) {
         SVT_ERROR("Instance %u : Invalid use_qp_file. use_qp_file must be [0 - 1]\n", channel_number + 1);
@@ -856,12 +849,10 @@ EbErrorType svt_av1_verify_settings(SequenceControlSet *scs) {
         SVT_ERROR("Instance %u: Variance boost octile must be between 1 and 8\n", channel_number + 1);
         return_error = EB_ErrorBadParameter;
     }
-#if FTR_STILL_PICTURE
     if ((int8_t)config->avif < 0 || (int8_t)config->avif > 1) {
         SVT_ERROR("Instance %u: avif must be either 0 or 1\n", channel_number + 1);
         return_error = EB_ErrorBadParameter;
     }
-#endif
     return return_error;
 }
 
@@ -909,11 +900,7 @@ EbErrorType svt_av1_set_default_params(EbSvtAv1EncConfiguration *config_ptr) {
     config_ptr->max_qp_allowed               = 63;
     config_ptr->min_qp_allowed               = 4;
     config_ptr->enable_adaptive_quantization = 2;
-#if FIX_DEFAULT_PRESET
     config_ptr->enc_mode                     = ENC_M8;
-#else
-    config_ptr->enc_mode                     = 10;
-#endif
     config_ptr->intra_period_length          = -2;
     config_ptr->multiply_keyint              = FALSE;
     config_ptr->intra_refresh_type           = 2;
@@ -959,14 +946,10 @@ EbErrorType svt_av1_set_default_params(EbSvtAv1EncConfiguration *config_ptr) {
     config_ptr->use_cpu_flags = EB_CPU_FLAGS_ALL;
 
     // Channel info
-#if CLN_LP_LVLS
 #if !SVT_AV1_CHECK_VERSION(3, 0, 0)
     config_ptr->logical_processors = 0;
 #endif
     config_ptr->level_of_parallelism = 0;
-#else
-    config_ptr->logical_processors = 0;
-#endif
     config_ptr->pin_threads          = 0;
     config_ptr->target_socket        = -1;
     config_ptr->channel_id           = 0;
@@ -1088,11 +1071,9 @@ void svt_av1_print_lib_params(SequenceControlSet *scs) {
             config->intra_refresh_type == SVT_AV1_FWDKF_REFRESH    ? "FWD key frame"
                 : config->intra_refresh_type == SVT_AV1_KF_REFRESH ? "key frame"
                                                                    : "Unknown key frame type");
-#if FTR_LOSSLESS_SUPPORT
         if (config->lossless) {
             SVT_INFO("SVT [config]: BRC mode\t\t\t\t\t\t\t: Lossless Coding \n");
         } else {
-#endif
             switch (config->rate_control_mode) {
             case SVT_AV1_RC_MODE_CQP_OR_CRF:
                 if (config->max_bit_rate)
@@ -1120,9 +1101,7 @@ void svt_av1_print_lib_params(SequenceControlSet *scs) {
                     (int)config->target_bit_rate / 1000);
                 break;
             }
-#if FTR_LOSSLESS_SUPPORT
         }
-#endif
         if (config->rate_control_mode != SVT_AV1_RC_MODE_CBR) {
             if (!config->enable_variance_boost) {
                 SVT_INFO("SVT [config]: AQ mode / variance boost \t\t\t\t\t: %d / %d\n",
@@ -1932,12 +1911,8 @@ EB_API EbErrorType svt_av1_enc_parse_parameter(EbSvtAv1EncConfiguration *config_
         {"hierarchical-levels", &config_struct->hierarchical_levels},
         {"tier", &config_struct->tier},
         {"level", &config_struct->level},
-#if CLN_LP_LVLS
 #if SVT_AV1_CHECK_VERSION(3, 0, 0)
         {"lp", &config_struct->level_of_parallelism},
-#else
-        {"lp", &config_struct->logical_processors},
-#endif
 #else
         {"lp", &config_struct->logical_processors},
 #endif
@@ -1997,12 +1972,8 @@ EB_API EbErrorType svt_av1_enc_parse_parameter(EbSvtAv1EncConfiguration *config_
         {"variance-boost-strength", &config_struct->variance_boost_strength},
         {"variance-octile", &config_struct->variance_octile},
         {"fast-decode", &config_struct->fast_decode},
-#if FTR_LOSSLESS_SUPPORT
         {"lossless", &config_struct->lossless},
-#endif
-#if FTR_STILL_PICTURE
         {"avif", &config_struct->avif},
-#endif
     };
     const size_t uint8_opts_size = sizeof(uint8_opts) / sizeof(uint8_opts[0]);
 

@@ -196,12 +196,8 @@
 #define ENABLE_VARIANCE_BOOST_TOKEN "--enable-variance-boost"
 #define VARIANCE_BOOST_STRENGTH_TOKEN "--variance-boost-strength"
 #define VARIANCE_OCTILE_TOKEN "--variance-octile"
-#if FTR_LOSSLESS_SUPPORT
 #define LOSSLESS_TOKEN "--lossless"
-#endif
-#if FTR_STILL_PICTURE
 #define AVIF_TOKEN "--avif"
-#endif
 static EbErrorType validate_error(EbErrorType err, const char *token, const char *value) {
     switch (err) {
     case EB_ErrorNone: return EB_ErrorNone;
@@ -1143,12 +1139,8 @@ ConfigEntry config_entry_specific[] = {
      "Resize denominator in event, in a list separated by ',', only applicable for mode == 4",
      set_cfg_generic_token},
 // --- end: REFERENCE SCALING SUPPORT
-#if FTR_LOSSLESS_SUPPORT
     {SINGLE_INPUT, LOSSLESS_TOKEN, "Enable lossless coding, default is 0 [0-1]", set_cfg_generic_token},
-#endif
-#if FTR_STILL_PICTURE
     {SINGLE_INPUT, AVIF_TOKEN, "Enable still-picture coding, default is 0 [0-1]", set_cfg_generic_token},
-#endif
     // Termination
     {SINGLE_INPUT, NULL, NULL, NULL}};
 
@@ -1375,13 +1367,9 @@ ConfigEntry config_entry[] = {
     {SINGLE_INPUT, VARIANCE_BOOST_STRENGTH_TOKEN, "VarianceBoostStrength", set_cfg_generic_token},
     {SINGLE_INPUT, VARIANCE_OCTILE_TOKEN, "VarianceOctile", set_cfg_generic_token},
 
-#if FTR_LOSSLESS_SUPPORT
     // Lossless coding
     {SINGLE_INPUT, LOSSLESS_TOKEN, "Lossless", set_cfg_generic_token},
-#endif
-#if FTR_STILL_PICTURE
     {SINGLE_INPUT, AVIF_TOKEN, "Avif", set_cfg_generic_token},
-#endif
     // Termination
     {SINGLE_INPUT, NULL, NULL, NULL}};
 
@@ -2199,13 +2187,8 @@ uint32_t get_passes(int32_t argc, char *const argv[], EncPass enc_pass[MAX_ENC_P
         if (passes == 1)
             multi_pass_mode = SINGLE_PASS;
         else if (passes > 1) {
-#if CLN_SHIFT_M11
             // M11, M12, and M13 are mapped to M10, so treat M11, M12, and M13 the same as M10
             if (enc_mode > ENC_M9) {
-#else
-            // M12 and M13 are mapped to M11, so treat M12 and M13 the same as M11
-            if (enc_mode > ENC_M10) {
-#endif
                 fprintf(stderr, "[SVT-Error]:  Multipass VBR is not supported for preset %d.\n\n", enc_mode);
                 return 0;
             } else {
