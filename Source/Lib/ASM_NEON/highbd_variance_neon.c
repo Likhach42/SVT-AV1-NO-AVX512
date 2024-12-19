@@ -117,32 +117,152 @@ static INLINE void highbd_variance_64xh_neon(const uint16_t *src, int src_stride
     highbd_variance_large_neon(src, src_stride, ref, ref_stride, 64, h, sse, sum);
 }
 
+
+
+
+
+
 static INLINE void highbd_variance_128xh_neon(const uint16_t *src, int src_stride, const uint16_t *ref, int ref_stride,
+
+
+
+
+
                                               int h, uint64_t *sse, int64_t *sum) {
+
+
+
+
+
     highbd_variance_large_neon(src, src_stride, ref, ref_stride, 128, h, sse, sum);
+
+
+
+
+
 }
 
+
+
+
+
+
 #define HBD_VARIANCE_WXH_10_NEON(w, h)                                                                   \
+
+
+
+
+
     uint32_t svt_aom_highbd_10_variance##w##x##h##_neon(                                                 \
+
+
+
+
+
         const uint8_t *src_ptr, int src_stride, const uint8_t *ref_ptr, int ref_stride, uint32_t *sse) { \
+
+
+
+
+
         uint64_t  sse_long = 0;                                                                          \
+
+
+
+
+
         int64_t   sum_long = 0;                                                                          \
+
+
+
+
+
         uint16_t *src      = CONVERT_TO_SHORTPTR(src_ptr);                                               \
+
+
+
+
+
         uint16_t *ref      = CONVERT_TO_SHORTPTR(ref_ptr);                                               \
+
+
+
+
+
         highbd_variance_##w##xh_neon(src, src_stride, ref, ref_stride, h, &sse_long, &sum_long);         \
+
+
+
+
+
         *sse        = (uint32_t)ROUND_POWER_OF_TWO(sse_long, 4);                                         \
+
+
+
+
+
         int     sum = (int)ROUND_POWER_OF_TWO(sum_long, 2);                                              \
+
+
+
+
+
         int64_t var = (int64_t)*sse - (((int64_t)sum * sum) / (w * h));                                  \
+
+
+
+
+
         return var >= 0 ? (uint32_t)var : 0;                                                             \
+
+
+
+
+
     }
 
+
+
+
+
+
 HBD_VARIANCE_WXH_10_NEON(4, 4)
+
+
+
+
+
 HBD_VARIANCE_WXH_10_NEON(4, 8)
+
+
+
+
+
 HBD_VARIANCE_WXH_10_NEON(4, 16)
 
+
+
+
+
+
 HBD_VARIANCE_WXH_10_NEON(8, 4)
+
+
+
+
+
 HBD_VARIANCE_WXH_10_NEON(8, 8)
+
+
+
+
+
 HBD_VARIANCE_WXH_10_NEON(8, 16)
+
+
+
+
+
 HBD_VARIANCE_WXH_10_NEON(8, 32)
 
 HBD_VARIANCE_WXH_10_NEON(16, 4)
