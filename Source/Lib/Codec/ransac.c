@@ -55,7 +55,6 @@ static int is_better_motion(const RANSAC_MOTION *motion_a, const RANSAC_MOTION *
     return compare_motions(motion_a, motion_b) < 0;
 }
 
-
 static void score_translation(const double *mat, const Correspondence *points, int num_points, RANSAC_MOTION *model) {
     model->num_inliers = 0;
     model->sse         = 0.0;

@@ -1155,7 +1155,7 @@ typedef struct ModeDecisionContext {
     NicCtrls        nic_ctrls;
     MV              ref_mv;
     uint16_t        sb_index;
-    uint64_t mds0_best_cost_per_class[CAND_CLASS_TOTAL];
+    uint64_t        mds0_best_cost_per_class[CAND_CLASS_TOTAL];
     uint64_t        mds0_best_cost;
     uint8_t         mds0_best_class;
     uint32_t        mds0_best_idx;

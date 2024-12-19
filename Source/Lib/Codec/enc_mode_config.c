@@ -109,18 +109,16 @@ uint8_t svt_aom_get_gm_core_level(EncMode enc_mode, bool super_res_off, EbInputR
                  (enc_mode <= ENC_M5 &&
                   (input_resolution == INPUT_SIZE_480p_RANGE || input_resolution == INPUT_SIZE_720p_RANGE))) {
             gm_level = 3;
-        }
-        else
+        } else
             gm_level = 0;
     }
     return gm_level;
 }
 
-
 uint8_t svt_aom_derive_gm_level(PictureParentControlSet *pcs, bool super_res_off) {
-    uint8_t       gm_level  = 0;
-    const EncMode enc_mode  = pcs->enc_mode;
-    const uint8_t is_islice = pcs->slice_type == I_SLICE;
+    uint8_t                 gm_level         = 0;
+    const EncMode           enc_mode         = pcs->enc_mode;
+    const uint8_t           is_islice        = pcs->slice_type == I_SLICE;
     const EbInputResolution input_resolution = pcs->input_resolution;
 
     // disable global motion when reference scaling enabled,
@@ -303,7 +301,7 @@ static void set_me_search_params(SequenceControlSet *scs, PictureParentControlSe
     } else if (enc_mode <= ENC_M6) {
         me_ctx->me_sa.sa_min = (SearchArea){16, 16};
         me_ctx->me_sa.sa_max = (SearchArea){64, 32};
-        q_mult = 7;
+        q_mult               = 7;
     } else if (enc_mode <= ENC_M7) {
         if (hierarchical_levels <= 3) {
             if (input_resolution < INPUT_SIZE_4K_RANGE) {
@@ -338,8 +336,8 @@ static void set_me_search_params(SequenceControlSet *scs, PictureParentControlSe
 
     // Modulate the ME search-area using qp
     if (q_mult) {
-        uint16_t q_weight = CLIP3(500, 1000, ((int)(q_mult * ((31 * pcs->scs->static_config.qp) - 700)) >> 3));
-        me_ctx->me_sa.sa_min.width  = MAX(8, (me_ctx->me_sa.sa_min.width * q_weight) / 1000);
+        uint16_t q_weight          = CLIP3(500, 1000, ((int)(q_mult * ((31 * pcs->scs->static_config.qp) - 700)) >> 3));
+        me_ctx->me_sa.sa_min.width = MAX(8, (me_ctx->me_sa.sa_min.width * q_weight) / 1000);
         me_ctx->me_sa.sa_min.height = MAX(3, (me_ctx->me_sa.sa_min.height * q_weight) / 1000);
         me_ctx->me_sa.sa_max.width  = MAX(8, (me_ctx->me_sa.sa_max.width * q_weight) / 1000);
         me_ctx->me_sa.sa_max.height = MAX(3, (me_ctx->me_sa.sa_max.height * q_weight) / 1000);
@@ -859,16 +857,12 @@ void svt_aom_sig_deriv_me_tf(PictureParentControlSet *pcs, MeContext *me_ctx) {
     svt_aom_set_mv_based_sa_ctrls(me_ctx, 0);
 
     svt_aom_set_me_8x8_var_ctrls(me_ctx, 0);
-    me_ctx->me_early_exit_th = pcs->tf_ctrls.hme_me_level <= 1
-        ? 0
-        : BLOCK_SIZE_64 * BLOCK_SIZE_64 * 4;
-    me_ctx->me_safe_limit_zz_th     = 0;
-    me_ctx->reduce_hme_l0_sr_th_min = 0;
-    me_ctx->reduce_hme_l0_sr_th_max = 0;
-    me_ctx->skip_frame              = 0;
-    me_ctx->prev_me_stage_based_exit_th = pcs->tf_ctrls.hme_me_level <= 1
-        ? 0
-        : BLOCK_SIZE_64 * BLOCK_SIZE_64 * 4;
+    me_ctx->me_early_exit_th            = pcs->tf_ctrls.hme_me_level <= 1 ? 0 : BLOCK_SIZE_64 * BLOCK_SIZE_64 * 4;
+    me_ctx->me_safe_limit_zz_th         = 0;
+    me_ctx->reduce_hme_l0_sr_th_min     = 0;
+    me_ctx->reduce_hme_l0_sr_th_max     = 0;
+    me_ctx->skip_frame                  = 0;
+    me_ctx->prev_me_stage_based_exit_th = pcs->tf_ctrls.hme_me_level <= 1 ? 0 : BLOCK_SIZE_64 * BLOCK_SIZE_64 * 4;
 };
 static void set_cdef_controls(PictureParentControlSet *pcs, uint8_t cdef_level, uint8_t fast_decode) {
     CdefControls *cdef_ctrls = &pcs->cdef_ctrls;
@@ -1996,13 +1990,16 @@ void svt_aom_sig_deriv_multi_processes(SequenceControlSet *scs, PictureParentCon
 void svt_aom_set_gm_controls(PictureParentControlSet *pcs, uint8_t gm_level) {
     GmControls *gm_ctrls = &pcs->gm_ctrls;
     switch (gm_level) {
-    case 0: gm_ctrls->enabled = 0;
+    case 0:
+        gm_ctrls->enabled    = 0;
         gm_ctrls->pp_enabled = 0;
         break;
 
-    case 1: gm_ctrls->enabled = 1; gm_ctrls->identiy_exit = 0;
-        gm_ctrls->search_start_model = TRANSLATION;
-        gm_ctrls->search_end_model   = AFFINE;
+    case 1:
+        gm_ctrls->enabled                      = 1;
+        gm_ctrls->identiy_exit                 = 0;
+        gm_ctrls->search_start_model           = TRANSLATION;
+        gm_ctrls->search_end_model             = AFFINE;
         gm_ctrls->bipred_only                  = 0;
         gm_ctrls->bypass_based_on_me           = 0;
         gm_ctrls->use_stationary_block         = 0;
@@ -2010,18 +2007,20 @@ void svt_aom_set_gm_controls(PictureParentControlSet *pcs, uint8_t gm_level) {
         gm_ctrls->params_refinement_steps      = 5;
         gm_ctrls->downsample_level             = GM_FULL;
 
-        gm_ctrls->corners       = 4;
-        gm_ctrls->chess_rfn     = 0;
-        gm_ctrls->match_sz      = 13;
-        gm_ctrls->inj_psq_glb   = FALSE;
-        gm_ctrls->pp_enabled    = 0;
-        gm_ctrls->ref_idx0_only = 0;
-        gm_ctrls->rfn_early_exit = 0;
+        gm_ctrls->corners               = 4;
+        gm_ctrls->chess_rfn             = 0;
+        gm_ctrls->match_sz              = 13;
+        gm_ctrls->inj_psq_glb           = FALSE;
+        gm_ctrls->pp_enabled            = 0;
+        gm_ctrls->ref_idx0_only         = 0;
+        gm_ctrls->rfn_early_exit        = 0;
         gm_ctrls->correspondence_method = CORNERS;
         break;
-    case 2: gm_ctrls->enabled = 1; gm_ctrls->identiy_exit = 1;
-        gm_ctrls->search_start_model = TRANSLATION;
-        gm_ctrls->search_end_model   = ROTZOOM;
+    case 2:
+        gm_ctrls->enabled                      = 1;
+        gm_ctrls->identiy_exit                 = 1;
+        gm_ctrls->search_start_model           = TRANSLATION;
+        gm_ctrls->search_end_model             = ROTZOOM;
         gm_ctrls->bipred_only                  = 0;
         gm_ctrls->bypass_based_on_me           = 0;
         gm_ctrls->use_stationary_block         = 0;
@@ -2032,10 +2031,10 @@ void svt_aom_set_gm_controls(PictureParentControlSet *pcs, uint8_t gm_level) {
         gm_ctrls->chess_rfn                    = 0;
         gm_ctrls->match_sz                     = 7;
         gm_ctrls->inj_psq_glb                  = FALSE;
-        gm_ctrls->pp_enabled = 1;
-        gm_ctrls->ref_idx0_only = 0;
-        gm_ctrls->rfn_early_exit = 0;
-        gm_ctrls->correspondence_method = CORNERS;
+        gm_ctrls->pp_enabled                   = 1;
+        gm_ctrls->ref_idx0_only                = 0;
+        gm_ctrls->rfn_early_exit               = 0;
+        gm_ctrls->correspondence_method        = CORNERS;
         break;
     case 3:
         gm_ctrls->enabled                      = 1;
@@ -2052,12 +2051,12 @@ void svt_aom_set_gm_controls(PictureParentControlSet *pcs, uint8_t gm_level) {
         gm_ctrls->chess_rfn                    = 1;
         gm_ctrls->match_sz                     = 7;
         gm_ctrls->inj_psq_glb                  = TRUE;
-        gm_ctrls->pp_enabled    = 0;
-        gm_ctrls->ref_idx0_only = 1;
-        gm_ctrls->rfn_early_exit        = 1;
-        gm_ctrls->correspondence_method = pcs->input_resolution <= INPUT_SIZE_480p_RANGE ? MV_8x8
-            : pcs->input_resolution <= INPUT_SIZE_1080p_RANGE                            ? MV_16x16
-                                                                                         : MV_32x32;
+        gm_ctrls->pp_enabled                   = 0;
+        gm_ctrls->ref_idx0_only                = 1;
+        gm_ctrls->rfn_early_exit               = 1;
+        gm_ctrls->correspondence_method        = pcs->input_resolution <= INPUT_SIZE_480p_RANGE ? MV_8x8
+                   : pcs->input_resolution <= INPUT_SIZE_1080p_RANGE                            ? MV_16x16
+                                                                                                : MV_32x32;
         break;
     default: assert(0); break;
     }
@@ -3428,7 +3427,7 @@ static void md_subpel_pme_controls(ModeDecisionContext *ctx, uint8_t md_subpel_p
         md_subpel_pme_ctrls->min_blk_sz            = 0;
         md_subpel_pme_ctrls->mvp_th                = 0;
         md_subpel_pme_ctrls->hp_mv_th              = 0;
-        md_subpel_pme_ctrls->bias_fp = 1;
+        md_subpel_pme_ctrls->bias_fp               = 1;
         break;
     case 3:
         md_subpel_pme_ctrls->enabled               = 1;
@@ -5040,8 +5039,7 @@ void svt_aom_set_nsq_search_ctrls(PictureControlSet *pcs, ModeDecisionContext *c
     NsqSearchCtrls *nsq_search_ctrls = &ctx->nsq_search_ctrls;
     if (pcs->mimic_only_tx_4x4)
         nsq_search_level = 0;
-    else
-        if (pcs->me_dist_mod && nsq_search_level) {
+    else if (pcs->me_dist_mod && nsq_search_level) {
         uint32_t dist_64, dist_32, dist_16, dist_8, me_8x8_cost_variance;
         if (pcs->scs->super_block_size == 64) {
             dist_64              = pcs->ppcs->me_64x64_distortion[ctx->sb_index];
@@ -6333,8 +6331,7 @@ static void set_txs_controls(PictureControlSet *pcs, ModeDecisionContext *ctx, u
 
     if (pcs->mimic_only_tx_4x4)
         txs_level = 1;
-    else
-        if (pcs->me_dist_mod && txs_level) {
+    else if (pcs->me_dist_mod && txs_level) {
         // med-banding
         uint32_t dist_64, dist_32, dist_16, dist_8, me_8x8_cost_variance;
         if (pcs->scs->super_block_size == 64) {
@@ -6379,7 +6376,8 @@ static void set_txs_controls(PictureControlSet *pcs, ModeDecisionContext *ctx, u
         txs_ctrls->min_sq_size               = 0;
         txs_ctrls->quadrant_th_sf            = 0;
         break;
-    case 3: txs_ctrls->enabled = 1;
+    case 3:
+        txs_ctrls->enabled                   = 1;
         txs_ctrls->prev_depth_coeff_exit_th  = 1;
         txs_ctrls->intra_class_max_depth_sq  = 1;
         txs_ctrls->intra_class_max_depth_nsq = 0;
@@ -7117,7 +7115,7 @@ that use 8x8 blocks will lose significant BD-Rate as the parent 16x16 me data wi
             int lpd1_lvl = pcs->pic_lpd1_lvl;
             if (pcs->slice_type != I_SLICE) {
                 int me_8x8 = pcs->ppcs->me_8x8_cost_variance[ctx->sb_index];
-                int th = enc_mode <= ENC_M9 ? 3 * ctx->qp_index : 3000;
+                int th     = enc_mode <= ENC_M9 ? 3 * ctx->qp_index : 3000;
 
                 // when lpd1 is optimized, this lpd1_lvl == 0 check should be removed, leaving only the lpd1_lvl +=2 statement
                 // this extra check has been added to help low-delay perform similarly to v1.7.0
@@ -7307,7 +7305,7 @@ void svt_aom_sig_deriv_enc_dec_light_pd1(PictureControlSet *pcs, ModeDecisionCon
     const bool     rtc_tune  = (pcs->scs->static_config.pred_structure == SVT_AV1_PRED_LOW_DELAY_B) ? true : false;
     const uint8_t  sc_class1 = ppcs->sc_class1;
     const EncMode  enc_mode  = pcs->enc_mode;
-    const Bool disable_rdoq_rtc = enc_mode <= ENC_M9 ? 0 : rtc_tune && sc_class1 ? 1 : 0;
+    const Bool     disable_rdoq_rtc = enc_mode <= ENC_M9 ? 0 : rtc_tune && sc_class1 ? 1 : 0;
     // the frame size of reference pics are different if enable reference scaling.
     // sb info can not be reused because super blocks are mismatched, so we set
     // the reference pic unavailable to avoid using wrong info
@@ -7716,8 +7714,7 @@ void svt_aom_sig_deriv_enc_dec(SequenceControlSet *scs, PictureControlSet *pcs, 
             skip_sub_depth_lvl = 0;
         else
             skip_sub_depth_lvl = 1;
-    }
-    else if (enc_mode <= ENC_M7)
+    } else if (enc_mode <= ENC_M7)
         skip_sub_depth_lvl = 1;
     else
         skip_sub_depth_lvl = 2;
@@ -8463,7 +8460,7 @@ void svt_aom_sig_deriv_mode_decision_config(SequenceControlSet *scs, PictureCont
     if (scs->low_latency_kf && is_islice)
         pcs->cfl_level = 0;
 
-        // Set the level for new/nearest/near injection
+    // Set the level for new/nearest/near injection
     if (enc_mode <= ENC_M4)
         pcs->new_nearest_near_comb_injection = is_base ? 2 : 0;
     else
@@ -8595,10 +8592,10 @@ Bypassing EncDec
     } else
         pcs->pic_bypass_encdec = 0;
 
-        /*
+    /*
 set lpd0_level
 */
-        // for the low delay enhance base layer frames, lower the enc_mode to improve the quality
+    // for the low delay enhance base layer frames, lower the enc_mode to improve the quality
     set_pic_lpd0_lvl(pcs, (pcs->ppcs->ld_enhanced_base_frame && enc_mode <= ENC_M9) ? enc_mode - 1 : enc_mode);
 
     pcs->pic_disallow_below_16x16 = svt_aom_get_disallow_below_16x16_picture_level(enc_mode);

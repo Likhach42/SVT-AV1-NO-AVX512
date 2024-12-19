@@ -844,7 +844,7 @@ void finish_cdef_search(PictureControlSet *pcs) {
     // When off, can save the cost of the application.
     if (cdef_ctrls->zero_fs_cost_bias) {
         const Bool is_16bit = (pcs->scs->static_config.encoder_bit_depth > EB_EIGHT_BIT);
-        uint16_t factor;
+        uint16_t   factor;
         for (i = 0; i < sb_count; i++) {
             if (is_16bit) {
                 factor = cdef_ctrls->zero_fs_cost_bias;

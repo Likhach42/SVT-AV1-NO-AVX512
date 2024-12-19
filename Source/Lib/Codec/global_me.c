@@ -36,10 +36,10 @@ void svt_aom_gm_pre_processor(PictureParentControlSet *pcs, PictureParentControl
 
     //fill gm controls to be used locally for the preprocessor gm pass.
     //final gm controls will be set later for the final gm detection pass.
-    pcs->gm_ctrls.enabled      = 1;
-    pcs->gm_ctrls.identiy_exit = 1;
-    pcs->gm_ctrls.search_start_model = TRANSLATION;
-    pcs->gm_ctrls.search_end_model   = ROTZOOM;
+    pcs->gm_ctrls.enabled                      = 1;
+    pcs->gm_ctrls.identiy_exit                 = 1;
+    pcs->gm_ctrls.search_start_model           = TRANSLATION;
+    pcs->gm_ctrls.search_end_model             = ROTZOOM;
     pcs->gm_ctrls.bipred_only                  = 0;
     pcs->gm_ctrls.bypass_based_on_me           = 1;
     pcs->gm_ctrls.use_stationary_block         = 0;
@@ -50,9 +50,8 @@ void svt_aom_gm_pre_processor(PictureParentControlSet *pcs, PictureParentControl
     pcs->gm_ctrls.chess_rfn                    = 1;
     pcs->gm_ctrls.match_sz                     = 7;
     pcs->gm_ctrls.inj_psq_glb                  = TRUE;
-    pcs->gm_ctrls.rfn_early_exit = 1;
-    pcs->gm_ctrls.correspondence_method = CORNERS;
-
+    pcs->gm_ctrls.rfn_early_exit               = 1;
+    pcs->gm_ctrls.correspondence_method        = CORNERS;
 
     PictureParentControlSet *ref_pcs_list[2];
     PictureParentControlSet *cur_pcs   = pcs_list[0];
@@ -135,9 +134,9 @@ void svt_aom_global_motion_estimation(PictureParentControlSet *pcs, EbPictureBuf
     EbPictureBufferDesc *quarter_picture_ptr;
     EbPictureBufferDesc *sixteenth_ref_pic_ptr;
     EbPictureBufferDesc *sixteenth_picture_ptr;
-    pa_reference_object   = (EbPaReferenceObject *)pcs->pa_ref_pic_wrapper->object_ptr;
-    quarter_picture_ptr   = (EbPictureBufferDesc *)pa_reference_object->quarter_downsampled_picture_ptr;
-    sixteenth_picture_ptr = (EbPictureBufferDesc *)pa_reference_object->sixteenth_downsampled_picture_ptr;
+    pa_reference_object            = (EbPaReferenceObject *)pcs->pa_ref_pic_wrapper->object_ptr;
+    quarter_picture_ptr            = (EbPictureBufferDesc *)pa_reference_object->quarter_downsampled_picture_ptr;
+    sixteenth_picture_ptr          = (EbPictureBufferDesc *)pa_reference_object->sixteenth_downsampled_picture_ptr;
     uint32_t num_of_list_to_search = (pcs->slice_type == P_SLICE) ? 1 /*List 0 only*/ : 2 /*List 0 + 1*/;
     // Initilize global motion to be OFF for all references frames.
     memset(pcs->is_global_motion, FALSE, MAX_NUM_OF_REF_PIC_LIST * REF_LIST_MAX_DEPTH);
@@ -365,20 +364,19 @@ void compute_global_motion(PictureParentControlSet *pcs, int *frm_corners, int n
     }
     int             num_correspondences = 0;
     Correspondence *correspondences     = (Correspondence *)malloc(size_correspondence * sizeof(Correspondence));
-    gm_compute_correspondence(
-        pcs,
-        det_frm_buffer,
-        det_input_pic->width,
-        det_input_pic->height,
-        det_input_pic->stride_y,
-        frm_corners,
-        num_frm_corners,
-        det_ref_buffer,
-        det_ref_pic->stride_y,
-        correspondences,
-        &num_correspondences,
-        list_idx,
-        ref_idx);
+    gm_compute_correspondence(pcs,
+                              det_frm_buffer,
+                              det_input_pic->width,
+                              det_input_pic->height,
+                              det_input_pic->stride_y,
+                              frm_corners,
+                              num_frm_corners,
+                              det_ref_buffer,
+                              det_ref_pic->stride_y,
+                              correspondences,
+                              &num_correspondences,
+                              list_idx,
+                              ref_idx);
 
     MotionModel params_by_motion[RANSAC_NUM_MOTIONS];
     for (int m = 0; m < RANSAC_NUM_MOTIONS; m++) {
@@ -395,11 +393,7 @@ void compute_global_motion(PictureParentControlSet *pcs, int *frm_corners, int n
 
         // Take the pre-computed correspondences (between cur frame/ref frame) and
         // determine the parameters for the current GM model
-        determine_gm_params(model,
-                            params_by_motion,
-                            RANSAC_NUM_MOTIONS,
-                            correspondences,
-                            num_correspondences);
+        determine_gm_params(model, params_by_motion, RANSAC_NUM_MOTIONS, correspondences, num_correspondences);
 
         for (unsigned i = 0; i < RANSAC_NUM_MOTIONS; ++i) {
             if (params_by_motion[i].num_inliers == 0)

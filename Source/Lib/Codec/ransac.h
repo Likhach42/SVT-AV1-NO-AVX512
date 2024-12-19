@@ -21,27 +21,23 @@
 
 #define MIN_INLIER_PROB 0.1
 
-static const double kIdentityParams[MAX_PARAMDIM] = {
-    0.0, 0.0, 1.0, 0.0, 0.0, 1.0
-};
+static const double kIdentityParams[MAX_PARAMDIM] = {0.0, 0.0, 1.0, 0.0, 0.0, 1.0};
 
 typedef struct {
     int    num_inliers;
     double sse;
-    int* inlier_indices;
+    int*   inlier_indices;
 } RANSAC_MOTION;
 
-typedef bool (*FindTransformationFunc)(const Correspondence* points,
-    const int* indices, int num_indices,
-    double* params);
-typedef void (*ScoreModelFunc)(const double* mat, const Correspondence* points,
-    int num_points, RANSAC_MOTION* model);
+typedef bool (*FindTransformationFunc)(const Correspondence* points, const int* indices, int num_indices,
+                                       double* params);
+typedef void (*ScoreModelFunc)(const double* mat, const Correspondence* points, int num_points, RANSAC_MOTION* model);
 
 // vtable-like structure which stores all of the information needed by RANSAC
 // for a particular model type
 typedef struct {
     FindTransformationFunc find_transformation;
-    ScoreModelFunc score_model;
+    ScoreModelFunc         score_model;
 
     // The minimum number of points which can be passed to find_transformation
     // to generate a model.
@@ -63,7 +59,6 @@ typedef struct {
     int minpts;
 } RansacModelInfo;
 
-bool svt_aom_ransac(const Correspondence* matched_points, int npoints,
-    TransformationType type, MotionModel* motion_models,
-    int num_desired_motions, bool* mem_alloc_failed);
+bool svt_aom_ransac(const Correspondence* matched_points, int npoints, TransformationType type,
+                    MotionModel* motion_models, int num_desired_motions, bool* mem_alloc_failed);
 #endif // AOM_AV1_ENCODER_RANSAC_H_

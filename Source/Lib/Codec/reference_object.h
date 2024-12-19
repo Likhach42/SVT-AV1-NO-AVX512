@@ -19,10 +19,10 @@
 #include "sequence_control_set.h"
 
 typedef struct EbReferenceObject {
-    EbDctor                     dctor;
-    EbPictureBufferDesc        *reference_picture;
-    EbPictureBufferDesc        *downscaled_reference_picture[NUM_SR_SCALES + 1][NUM_RESIZE_SCALES + 1];
-    uint64_t                    downscaled_picture_number[NUM_SR_SCALES + 1]
+    EbDctor              dctor;
+    EbPictureBufferDesc *reference_picture;
+    EbPictureBufferDesc *downscaled_reference_picture[NUM_SR_SCALES + 1][NUM_RESIZE_SCALES + 1];
+    uint64_t             downscaled_picture_number[NUM_SR_SCALES + 1]
                                       [NUM_RESIZE_SCALES + 1]; // save the picture_number for each denom
     EbHandle             resize_mutex[NUM_SR_SCALES + 1][NUM_RESIZE_SCALES + 1];
     uint64_t             ref_poc;

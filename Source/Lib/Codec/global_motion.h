@@ -85,9 +85,8 @@ void gm_compute_correspondence(PictureParentControlSet* pcs, uint8_t* frm_buffer
   number of inlier feature points for each motion. Params for which the
   num_inliers entry is 0 should be ignored by the caller.
 */
-void determine_gm_params(TransformationType type,
-                         MotionModel* params_by_motion,
-                         int num_motions, Correspondence* correspondences, int num_correspondences);
+void determine_gm_params(TransformationType type, MotionModel* params_by_motion, int num_motions,
+                         Correspondence* correspondences, int num_correspondences);
 #ifdef __cplusplus
 } // extern "C"
 #endif

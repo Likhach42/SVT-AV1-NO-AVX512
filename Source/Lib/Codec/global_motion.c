@@ -21,8 +21,6 @@
 
 #include "enc_warped_motion.h"
 
-
-
 // Border over which to compute the global motion
 #define ERRORADV_BORDER 0
 
@@ -37,16 +35,16 @@ int svt_av1_is_enough_erroradvantage(double best_erroradvantage, int params_cost
 
 static void convert_to_params(const double* params, int32_t* model) {
     int i;
-    model[0]          = (int32_t)floor(params[0] * (1 << GM_TRANS_PREC_BITS) + 0.5);
-    model[1]          = (int32_t)floor(params[1] * (1 << GM_TRANS_PREC_BITS) + 0.5);
-    model[0]          = (int32_t)clamp(model[0], GM_TRANS_MIN, GM_TRANS_MAX) * GM_TRANS_DECODE_FACTOR;
-    model[1]          = (int32_t)clamp(model[1], GM_TRANS_MIN, GM_TRANS_MAX) * GM_TRANS_DECODE_FACTOR;
+    model[0] = (int32_t)floor(params[0] * (1 << GM_TRANS_PREC_BITS) + 0.5);
+    model[1] = (int32_t)floor(params[1] * (1 << GM_TRANS_PREC_BITS) + 0.5);
+    model[0] = (int32_t)clamp(model[0], GM_TRANS_MIN, GM_TRANS_MAX) * GM_TRANS_DECODE_FACTOR;
+    model[1] = (int32_t)clamp(model[1], GM_TRANS_MIN, GM_TRANS_MAX) * GM_TRANS_DECODE_FACTOR;
 
     for (i = 2; i < 6; ++i) {
         const int diag_value = ((i == 2 || i == 5) ? (1 << GM_ALPHA_PREC_BITS) : 0);
         model[i]             = (int32_t)floor(params[i] * (1 << GM_ALPHA_PREC_BITS) + 0.5);
         model[i]             = (int32_t)clamp(model[i] - diag_value, GM_ALPHA_MIN, GM_ALPHA_MAX);
-        model[i] = (model[i] + diag_value) * GM_ALPHA_DECODE_FACTOR;
+        model[i]             = (model[i] + diag_value) * GM_ALPHA_DECODE_FACTOR;
     }
 }
 
@@ -61,7 +59,7 @@ static INLINE TransformationType get_wmtype(const EbWarpedMotionParams* gm) {
         return AFFINE;
 }
 
-void svt_av1_convert_model_to_params(const double *params, EbWarpedMotionParams *model) {
+void svt_av1_convert_model_to_params(const double* params, EbWarpedMotionParams* model) {
     convert_to_params(params, model->wmmat);
     model->wmtype  = get_wmtype(model);
     model->invalid = 0;
@@ -121,10 +119,10 @@ int64_t svt_av1_refine_integerized_param(GmControls* gm_ctrls, EbWarpedMotionPar
     const int        border                              = ERRORADV_BORDER;
     int              i                                   = 0, p;
     int              n_params                            = max_trans_model_params[wmtype];
-    int32_t         *param_mat                           = wm->wmmat;
+    int32_t*         param_mat                           = wm->wmmat;
     int64_t          step_error, best_error;
     int32_t          step;
-    int32_t         *param;
+    int32_t*         param;
     int32_t          curr_param;
     int32_t          best_param;
 
@@ -200,14 +198,12 @@ int64_t svt_av1_refine_integerized_param(GmControls* gm_ctrls, EbWarpedMotionPar
                 best_param = *param;
             }
             *param = best_param;
-
         }
     }
     force_wmtype(wm, wmtype);
     wm->wmtype = get_wmtype(wm);
     return best_error;
 }
-
 
 // Generate the corresponding points for the current ref frame. The corners of the current frame are input.
 // The function will compute the corners of the ref frame and then generate the correspondence points.

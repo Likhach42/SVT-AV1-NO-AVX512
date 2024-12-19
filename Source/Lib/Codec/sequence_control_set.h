@@ -162,18 +162,18 @@ typedef struct SequenceControlSet {
     uint8_t tile_group_row_count_array[MAX_TEMPORAL_LAYERS];
 
     /*!< Segements (sub picture) count for different processes */
-    uint32_t     me_segment_column_count_array[MAX_TEMPORAL_LAYERS];
-    uint32_t     me_segment_row_count_array[MAX_TEMPORAL_LAYERS];
-    uint32_t     enc_dec_segment_col_count_array[MAX_TEMPORAL_LAYERS];
-    uint32_t     enc_dec_segment_row_count_array[MAX_TEMPORAL_LAYERS];
-    uint32_t     tpl_segment_col_count_array;
-    uint32_t     tpl_segment_row_count_array;
-    uint32_t     cdef_segment_column_count;
-    uint32_t     cdef_segment_row_count;
-    uint32_t     rest_segment_column_count;
-    uint32_t     rest_segment_row_count;
-    uint32_t     tf_segment_column_count;
-    uint32_t     tf_segment_row_count;
+    uint32_t me_segment_column_count_array[MAX_TEMPORAL_LAYERS];
+    uint32_t me_segment_row_count_array[MAX_TEMPORAL_LAYERS];
+    uint32_t enc_dec_segment_col_count_array[MAX_TEMPORAL_LAYERS];
+    uint32_t enc_dec_segment_row_count_array[MAX_TEMPORAL_LAYERS];
+    uint32_t tpl_segment_col_count_array;
+    uint32_t tpl_segment_row_count_array;
+    uint32_t cdef_segment_column_count;
+    uint32_t cdef_segment_row_count;
+    uint32_t rest_segment_column_count;
+    uint32_t rest_segment_row_count;
+    uint32_t tf_segment_column_count;
+    uint32_t tf_segment_row_count;
     // level of parallelism determined based on the core count
     uint32_t lp;
 

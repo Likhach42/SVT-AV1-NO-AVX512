@@ -110,11 +110,11 @@ typedef struct QuantParam {
 } QuantParam;
 
 static const uint32_t q_func[] = {26214, 23302, 20560, 18396, 16384, 14564};
-extern EbErrorType svt_aom_estimate_transform(PictureControlSet *pcs, ModeDecisionContext *ctx,
-                                              int16_t *residual_buffer, uint32_t residual_stride, int32_t *coeff_buffer,
-                                              uint32_t coeff_stride, TxSize transform_size, uint64_t *three_quad_energy,
-                                              uint32_t bit_depth, TxType transform_type, PlaneType component_type,
-                                              EB_TRANS_COEFF_SHAPE trans_coeff_shape);
+extern EbErrorType    svt_aom_estimate_transform(PictureControlSet *pcs, ModeDecisionContext *ctx,
+                                                 int16_t *residual_buffer, uint32_t residual_stride, int32_t *coeff_buffer,
+                                                 uint32_t coeff_stride, TxSize transform_size, uint64_t *three_quad_energy,
+                                                 uint32_t bit_depth, TxType transform_type, PlaneType component_type,
+                                                 EB_TRANS_COEFF_SHAPE trans_coeff_shape);
 
 extern uint8_t svt_aom_quantize_inv_quantize(PictureControlSet *pcs, ModeDecisionContext *ctx, int32_t *coeff,
                                              int32_t *quant_coeff, int32_t *recon_coeff, uint32_t qindex,

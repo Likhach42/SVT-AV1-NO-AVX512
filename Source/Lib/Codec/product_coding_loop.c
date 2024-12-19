@@ -6772,12 +6772,12 @@ static void md_stage_2(PictureControlSet *pcs, ModeDecisionContext *ctx, EbPictu
         ModeDecisionCandidateBuffer *cand_bf        = cand_bf_ptr_array[candidateIndex];
         ModeDecisionCandidate       *cand           = cand_bf->cand;
         ctx->mds_tx_size_mode                       = 0;
-        ctx->mds_txt_level = svt_av1_is_lossless_segment(pcs, ctx->blk_ptr->segment_id) ? 0
-            : is_intra_mode(cand->pred_mode)                                            ? ctx->txt_ctrls.enabled
-                                                                                        : 0;
-        ctx->mds_skip_rdoq            = is_intra_mode(cand->pred_mode) ? TRUE : FALSE;
-        ctx->mds_skip_full_uv         = TRUE;
-        ctx->mds_spatial_sse          = ctx->spatial_sse_ctrls.spatial_sse_full_loop_level;
+        ctx->mds_txt_level                          = svt_av1_is_lossless_segment(pcs, ctx->blk_ptr->segment_id) ? 0
+                                     : is_intra_mode(cand->pred_mode) ? ctx->txt_ctrls.enabled
+                                                                      : 0;
+        ctx->mds_skip_rdoq                          = is_intra_mode(cand->pred_mode) ? TRUE : FALSE;
+        ctx->mds_skip_full_uv                       = TRUE;
+        ctx->mds_spatial_sse                        = ctx->spatial_sse_ctrls.spatial_sse_full_loop_level;
         ctx->mds_fast_coeff_est_level = (ctx->pd_pass == PD_PASS_1) ? 1 : ctx->rate_est_ctrls.pd0_fast_coeff_est_level;
         ctx->mds_subres_step          = (ctx->pd_pass == PD_PASS_1) ? 0 : ctx->subres_ctrls.step;
 
@@ -6895,7 +6895,7 @@ static void md_stage_3(PictureControlSet *pcs, ModeDecisionContext *ctx, EbPictu
         ctx->mds_skip_ifs = (ctx->ifs_ctrls.level == IFS_MDS3) ? FALSE : TRUE;
 
         ctx->mds_tx_size_mode = ctx->txs_ctrls.enabled && (ctx->blk_geom->sq_size >= ctx->txs_ctrls.min_sq_size);
-        ctx->mds_txt_level = svt_av1_is_lossless_segment(pcs, ctx->blk_ptr->segment_id) ? 0 : ctx->txt_ctrls.enabled;
+        ctx->mds_txt_level    = svt_av1_is_lossless_segment(pcs, ctx->blk_ptr->segment_id) ? 0 : ctx->txt_ctrls.enabled;
         ctx->mds_skip_full_uv = FALSE;
 
         ctx->mds_skip_rdoq = FALSE;

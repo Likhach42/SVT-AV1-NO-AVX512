@@ -160,7 +160,7 @@ static void improve_correspondence(unsigned char *frm, unsigned char *ref, int w
 int svt_av1_determine_correspondence(uint8_t *frm, int *frm_corners, int num_frm_corners, uint8_t *ref,
                                      int *ref_corners, int num_ref_corners, int width, int height, int frm_stride,
                                      int ref_stride, Correspondence *correspondences, uint8_t match_sz) {
-    int i, j;
+    int       i, j;
     int       num_correspondences = 0;
     const int thresh              = (width < height ? height : width) >> 4;
     const int threshSqr           = thresh * thresh;

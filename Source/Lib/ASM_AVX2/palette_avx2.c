@@ -15,7 +15,6 @@
 #include "random.h"
 #define DIVIDE_AND_ROUND(x, y) (((x) + ((y) >> 1)) / (y))
 
-
 /* That same calculation as: av1_calc_indices_dist_dim1_avx2(),
    but not calculate sum at the end. */
 void svt_av1_calc_indices_dim1_avx2(const int *data, const int *centroids, uint8_t *indices, int n, int k) {
