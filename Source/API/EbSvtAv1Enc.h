@@ -915,6 +915,14 @@ typedef struct EbSvtAv1EncConfiguration {
      *  Default is 0. */
     uint8_t variance_boost_curve;
 
+    /**
+     * @brief Noise normalization strength; modifies the encoder's willingness
+     * to boost AC coefficients in low-noise blocks.
+     * Min value is 0.
+     * Max value is 4.
+     * Default is 0 (off). */
+    uint8_t noise_norm_strength;
+
     /* @brief Signal to the library to enable losless coding
      *
      * Default is false.
