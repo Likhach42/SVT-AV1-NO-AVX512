@@ -416,117 +416,120 @@ Linux Gstreamer (Static):
         ! webmmux \
         ! filesink location=akiyo.mkv
 
-#Linux libavif (Static):
-#  extends: .linux-test-base
-#  stage: standalone
-#  variables:
-#    CC: gcc-11
-#    CXX: g++-11
-#    CFLAGS: -pipe
-#    CXXFLAGS: -pipe
-#    LDFLAGS: -pipe
-#    PKG_CONFIG_PATH: /usr/local/lib/pkgconfig
-#    GIT_DEPTH: 0
-#    CMAKE_BUILD_TYPE: Debug
-#  before_script:
-#    - !reference [.ffmpeg-before-script-git-setup]
-#    - git clone $PWD svtav1-src
-#    - git clone https://github.com/AOMediaCodec/libavif.git libavif-src
-#    - git clone https://code.videolan.org/videolan/dav1d.git dav1d-src
-#    - !reference [.ffmpeg-before-script-export]
-#    - apt update && apt install -yyy libpng-dev libjpeg-dev
-#  script:
-#    - !reference [.ffmpeg-svtav1-script]
-#    - !reference [.ffmpeg-dav1d-script]
-#    - cmake
-#      -S libavif-src
-#      -B libavif-build
-#      -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE"
-#      -DBUILD_SHARED_LIBS="$BUILD_SHARED_LIBS"
-#      -DCMAKE_INSTALL_PREFIX="$PREFIX_DIR"
-#      -DAVIF_CODEC_DAV1D=SYSTEM
-#      -DAVIF_CODEC_SVT=SYSTEM
-#      -DAVIF_BUILD_EXAMPLES=ON
-#      -DAVIF_BUILD_APPS=ON
-#      -DAVIF_LIBYUV=OFF #Remove this token once upgraded to Ubuntu 22
-#    - cmake --build libavif-build --config Release --target install
-#    - valgrind --error-exitcode=1 --track-origins=yes --suppressions=/usr/lib/valgrind/debian.supp -- avifenc -c svt -d 8 -y 420 -r limited -j 2 ./Docs/img/me_fig_new.png out.avif
+Linux libavif (Static):
+  extends: .linux-test-base
+  stage: standalone
+  variables:
+    CC: gcc-11
+    CXX: g++-11
+    CFLAGS: -pipe
+    CXXFLAGS: -pipe
+    LDFLAGS: -pipe
+    PKG_CONFIG_PATH: /usr/local/lib/pkgconfig
+    GIT_DEPTH: 0
+    CMAKE_BUILD_TYPE: Debug
+  before_script:
+    - !reference [.ffmpeg-before-script-git-setup]
+    - git clone $PWD svtav1-src
+    - git clone https://github.com/AOMediaCodec/libavif.git libavif-src
+    - git clone https://code.videolan.org/videolan/dav1d.git dav1d-src
+    - git -C libavif-src apply $PWD/.gitlab/workflows/linux/libavif_api_job_fix.patch
+    - !reference [.ffmpeg-before-script-export]
+    - apt update && apt install -yyy libpng-dev libjpeg-dev
+  script:
+    - !reference [.ffmpeg-svtav1-script]
+    - !reference [.ffmpeg-dav1d-script]
+    - cmake
+      -S libavif-src
+      -B libavif-build
+      -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE"
+      -DBUILD_SHARED_LIBS="$BUILD_SHARED_LIBS"
+      -DCMAKE_INSTALL_PREFIX="$PREFIX_DIR"
+      -DAVIF_CODEC_DAV1D=SYSTEM
+      -DAVIF_CODEC_SVT=SYSTEM
+      -DAVIF_BUILD_EXAMPLES=ON
+      -DAVIF_BUILD_APPS=ON
+      -DAVIF_LIBYUV=OFF #Remove this token once upgraded to Ubuntu 22
+    - cmake --build libavif-build --config Release --target install
+    - valgrind --error-exitcode=1 --track-origins=yes --suppressions=/usr/lib/valgrind/debian.supp -- avifenc -c svt -d 8 -y 420 -r limited -j 2 ./Docs/img/me_fig_new.png out.avif
 
-#Linux FFmpeg (n7.0.2, Static):
-#  extends: .linux-test-base
-#  stage: ffmpeg
-#  variables:
-#    CC: gcc-11
-#    CXX: g++-11
-#    CFLAGS: -pipe
-#    CXXFLAGS: -pipe
-#    LDFLAGS: -pipe -static -static-libgcc -static-libstdc++
-#    GIT_DEPTH: 0
-#    CMAKE_BUILD_TYPE: Debug
-#  before_script:
-#    - !reference [.ffmpeg-before-script-git-setup]
-#    - !reference [.ffmpeg-before-script-clone]
-#    - git -C ffmpeg-src checkout n7.0.2
-#    - !reference [.ffmpeg-before-script-export]
-#  script:
-#    - !reference [.ffmpeg-svtav1-script]
-#    - !reference [.ffmpeg-aom-script]
-#    - !reference [.ffmpeg-libvpx-script]
-#    - !reference [.ffmpeg-dav1d-script]
-#    - !reference [.ffmpeg-vmaf-script]
-#    # symbol conflict tests
-#    - |
-#      conflicts=$(
-#        nm -Ag --defined-only ${PREFIX_DIR}/lib/lib{SvtAv1Enc,aom,dav1d,vpx,vmaf}.a 2>/dev/null |
-#        sort -k3 |
-#        uniq -D -f2 |
-#        sed '/:$/d;/^$/d'
-#      )
-#      if [ -n "$conflicts" ]; then
-#        printf 'Conflicts Found!\n%s\n' "$conflicts"
-#        exit 1
-#      fi
-#    - !reference [.ffmpeg-ffmpeg-script]
-#    - ccache -s
-#  artifacts:
-#    untracked: false
-#    expire_in: 30 days
-#    paths:
-#      - ffmpeg
-#
-#Linux FFmpeg (n5.0, Static):
-#  extends: .linux-test-base
-#  stage: ffmpeg
-#  variables:
-#    CC: gcc-11
-#    CXX: g++-11
-#    CFLAGS: -pipe
-#    CXXFLAGS: -pipe
-#    LDFLAGS: -pipe -static -static-libgcc -static-libstdc++
-#    GIT_DEPTH: 0
-#    CMAKE_BUILD_TYPE: Debug
-#  before_script:
-#    - !reference [.ffmpeg-before-script-git-setup]
-#    - !reference [.ffmpeg-before-script-clone]
-#    - git -C ffmpeg-src checkout n5.0
-#    - git -C ffmpeg-src am -3 "$PWD/ffmpeg_plugin/n5.0/"*.patch
-#    - !reference [.ffmpeg-before-script-export]
-#  script:
-#    - !reference [.ffmpeg-svtav1-script]
-#    - !reference [.ffmpeg-ffmpeg-script]
-#    - ccache -s
-#  after_script:
-#    - ./ffmpeg -y -s:v 64x64 -f rawvideo -i /dev/zero
-#      -vframes 10 -c:v libsvtav1 test.mkv
-#      -vframes 10 -c:v libsvtav1 test.mp4
-#      -vframes 10 -c:v libsvtav1 test.webm
-#      -vframes 10 -c:v libsvtav1 test.ivf
-#      -vframes 10 -c:v libsvtav1 test.obu
-#  artifacts:
-#    untracked: false
-#    expire_in: 30 days
-#    paths:
-#      - ffmpeg
+Linux FFmpeg (n7.0.2, Static):
+  extends: .linux-test-base
+  stage: ffmpeg
+  variables:
+    CC: gcc-11
+    CXX: g++-11
+    CFLAGS: -pipe
+    CXXFLAGS: -pipe
+    LDFLAGS: -pipe -static -static-libgcc -static-libstdc++
+    GIT_DEPTH: 0
+    CMAKE_BUILD_TYPE: Debug
+  before_script:
+    - !reference [.ffmpeg-before-script-git-setup]
+    - !reference [.ffmpeg-before-script-clone]
+    - git -C ffmpeg-src checkout n7.0.2
+    - git -C ffmpeg-src apply $PWD/.gitlab/workflows/linux/ffmpeg_n7_fix.patch
+    - !reference [.ffmpeg-before-script-export]
+  script:
+    - !reference [.ffmpeg-svtav1-script]
+    - !reference [.ffmpeg-aom-script]
+    - !reference [.ffmpeg-libvpx-script]
+    - !reference [.ffmpeg-dav1d-script]
+    - !reference [.ffmpeg-vmaf-script]
+    # symbol conflict tests
+    - |
+      conflicts=$(
+        nm -Ag --defined-only ${PREFIX_DIR}/lib/lib{SvtAv1Enc,aom,dav1d,vpx,vmaf}.a 2>/dev/null |
+        sort -k3 |
+        uniq -D -f2 |
+        sed '/:$/d;/^$/d'
+      )
+      if [ -n "$conflicts" ]; then
+        printf 'Conflicts Found!\n%s\n' "$conflicts"
+        exit 1
+      fi
+    - !reference [.ffmpeg-ffmpeg-script]
+    - ccache -s
+  artifacts:
+    untracked: false
+    expire_in: 30 days
+    paths:
+      - ffmpeg
+
+Linux FFmpeg (n5.0, Static):
+  extends: .linux-test-base
+  stage: ffmpeg
+  variables:
+    CC: gcc-11
+    CXX: g++-11
+    CFLAGS: -pipe
+    CXXFLAGS: -pipe
+    LDFLAGS: -pipe -static -static-libgcc -static-libstdc++
+    GIT_DEPTH: 0
+    CMAKE_BUILD_TYPE: Debug
+  before_script:
+    - !reference [.ffmpeg-before-script-git-setup]
+    - !reference [.ffmpeg-before-script-clone]
+    - git -C ffmpeg-src checkout n5.0
+    - git -C ffmpeg-src am -3 "$PWD/ffmpeg_plugin/n5.0/"*.patch
+    - git -C ffmpeg-src apply $PWD/.gitlab/workflows/linux/ffmpeg_n5_fix.patch
+    - !reference [.ffmpeg-before-script-export]
+  script:
+    - !reference [.ffmpeg-svtav1-script]
+    - !reference [.ffmpeg-ffmpeg-script]
+    - ccache -s
+  after_script:
+    - ./ffmpeg -y -s:v 64x64 -f rawvideo -i /dev/zero
+      -vframes 10 -c:v libsvtav1 test.mkv
+      -vframes 10 -c:v libsvtav1 test.mp4
+      -vframes 10 -c:v libsvtav1 test.webm
+      -vframes 10 -c:v libsvtav1 test.ivf
+      -vframes 10 -c:v libsvtav1 test.obu
+  artifacts:
+    untracked: false
+    expire_in: 30 days
+    paths:
+      - ffmpeg
 
 Linux Startup MG Test:
   extends: .linux-test-base

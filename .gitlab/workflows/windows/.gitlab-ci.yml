@@ -98,120 +98,121 @@ Win64 Enc Test:
   needs:
     - Win64 (MSVC, Tests)
 
-#Win64 FFmpeg (Static):
-#  extends: .windows-test-base
-#  stage: ffmpeg
-#  variables:
-#    CC: ccache gcc
-#    CXX: ccache g++
-#    CFLAGS: -pipe
-#    CXXFLAGS: -pipe
-#    LDFLAGS: -pipe -static -static-libgcc -static-libstdc++
-#    GIT_DEPTH: 0
-#    PREFIX_DIR: C:/msys64/mingw64
-#  before_script:
-#    - !reference [.ffmpeg-before-script-clone-windows]
-#  script:
-#    # SVT-AV1
-#    - |
-#      time cmake `
-#        -S svtav1-src `
-#        -B svtav1-build `
-#        -DCMAKE_BUILD_TYPE=Release `
-#        -DBUILD_SHARED_LIBS=OFF `
-#        -DCMAKE_INSTALL_PREFIX="$env:PREFIX_DIR" `
-#        -DBUILD_APPS=OFF `
-#        -DREPRODUCIBLE_BUILDS=ON || $(
-#          Get-Content svtav1-build/CMakeFiles/CMakeConfigureLog.yaml
-#          exit 1
-#        )
-#      time cmake --build svtav1-build --config Release --target install
-#    # aom
-#    - |
-#      time cmake `
-#        -S aom-src `
-#        -B aom-build `
-#        -DCMAKE_BUILD_TYPE=Release `
-#        -DBUILD_SHARED_LIBS=OFF `
-#        -DCMAKE_INSTALL_PREFIX="$env:PREFIX_DIR" `
-#        -DENABLE_TESTS=0 `
-#        -DENABLE_EXAMPLES=0 `
-#        -DENABLE_DOCS=0 `
-#        -DENABLE_TESTDATA=0 `
-#        -DENABLE_TOOLS=0
-#      time cmake --build aom-build --config Release --target install
-#    # libvpx
-#    - |
-#      mkdir vpx-build
-#      cd vpx-build
-#      time dash ../libvpx-src/configure `
-#        --disable-dependency-tracking `
-#        --disable-docs `
-#        --disable-examples `
-#        --disable-libyuv `
-#        --disable-postproc `
-#        --disable-shared `
-#        --disable-tools `
-#        --disable-unit-tests `
-#        --disable-webm-io `
-#        --enable-postproc `
-#        --enable-runtime-cpu-detect `
-#        --enable-vp8 --enable-vp9 `
-#        --enable-vp9-highbitdepth `
-#        --enable-vp9-postproc `
-#        --prefix="$env:PREFIX_DIR"
-#      time make -j $((Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors + 2) install
-#      cd ..
-#    # dav1d
-#    - |
-#      time meson setup `
-#        --default-library static `
-#        --buildtype release `
-#        --libdir lib `
-#        --prefix "$env:PREFIX_DIR" `
-#        -Denable_tests=false `
-#        -Denable_examples=false `
-#        -Denable_tools=false `
-#        dav1d-build dav1d-src
-#      time meson install -C dav1d-build
-#    # vmaf
-#    - |
-#      time meson setup `
-#        --default-library static `
-#        --buildtype release `
-#        --libdir lib `
-#        --prefix "$env:PREFIX_DIR" `
-#        -Denable_tests=false `
-#        -Denable_docs=false `
-#        -Dbuilt_in_models=true `
-#        -Denable_float=true `
-#        vmaf-build vmaf-src/libvmaf
-#      time meson install -C vmaf-build
-#
-#    # FFmpeg
-#    # Uses ld=CXX for libvmaf to autolink the stdc++ library
-#    - |
-#      mkdir ffmpeg-build
-#      cd ffmpeg-build
-#      time bash ../ffmpeg-src/configure `
-#        --arch=x86_64 `
-#        --pkg-config-flags="--static" `
-#        --cc="${env:CC}" `
-#        --cxx="${env:CXX}" `
-#        --ld="${env:CXX}" `
-#        --enable-gpl --enable-static `
-#        --prefix="$env:PREFIX_DIR" `
-#        --enable-libaom `
-#        --enable-libdav1d `
-#        --enable-libsvtav1 `
-#        --enable-libvmaf `
-#        --enable-libvpx `
-#        --disable-shared
-#      time make -j $((Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors + 2) install
-#      cp ./ffmpeg.exe $env:CI_PROJECT_DIR
-#    - ccache -s
-#  artifacts:
-#    untracked: false
-#    expire_in: 30 day
-#    paths:
-#      - ffmpeg.exe
+Win64 FFmpeg (Static):
+  extends: .windows-test-base
+  stage: ffmpeg
+  variables:
+    CC: ccache gcc
+    CXX: ccache g++
+    CFLAGS: -pipe
+    CXXFLAGS: -pipe
+    LDFLAGS: -pipe -static -static-libgcc -static-libstdc++
+    GIT_DEPTH: 0
+    PREFIX_DIR: C:/msys64/mingw64
+  before_script:
+    - !reference [.ffmpeg-before-script-clone-windows]
+    - git -C ffmpeg-src apply $PWD/.gitlab/workflows/linux/ffmpeg_n7_fix.patch
+  script:
+    # SVT-AV1
+    - |
+      time cmake `
+        -S svtav1-src `
+        -B svtav1-build `
+        -DCMAKE_BUILD_TYPE=Release `
+        -DBUILD_SHARED_LIBS=OFF `
+        -DCMAKE_INSTALL_PREFIX="$env:PREFIX_DIR" `
+        -DBUILD_APPS=OFF `
+        -DREPRODUCIBLE_BUILDS=ON || $(
+          Get-Content svtav1-build/CMakeFiles/CMakeConfigureLog.yaml
+          exit 1
+        )
+      time cmake --build svtav1-build --config Release --target install
+    # aom
+    - |
+      time cmake `
+        -S aom-src `
+        -B aom-build `
+        -DCMAKE_BUILD_TYPE=Release `
+        -DBUILD_SHARED_LIBS=OFF `
+        -DCMAKE_INSTALL_PREFIX="$env:PREFIX_DIR" `
+        -DENABLE_TESTS=0 `
+        -DENABLE_EXAMPLES=0 `
+        -DENABLE_DOCS=0 `
+        -DENABLE_TESTDATA=0 `
+        -DENABLE_TOOLS=0
+      time cmake --build aom-build --config Release --target install
+    # libvpx
+    - |
+      mkdir vpx-build
+      cd vpx-build
+      time dash ../libvpx-src/configure `
+        --disable-dependency-tracking `
+        --disable-docs `
+        --disable-examples `
+        --disable-libyuv `
+        --disable-postproc `
+        --disable-shared `
+        --disable-tools `
+        --disable-unit-tests `
+        --disable-webm-io `
+        --enable-postproc `
+        --enable-runtime-cpu-detect `
+        --enable-vp8 --enable-vp9 `
+        --enable-vp9-highbitdepth `
+        --enable-vp9-postproc `
+        --prefix="$env:PREFIX_DIR"
+      time make -j $((Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors + 2) install
+      cd ..
+    # dav1d
+    - |
+      time meson setup `
+        --default-library static `
+        --buildtype release `
+        --libdir lib `
+        --prefix "$env:PREFIX_DIR" `
+        -Denable_tests=false `
+        -Denable_examples=false `
+        -Denable_tools=false `
+        dav1d-build dav1d-src
+      time meson install -C dav1d-build
+    # vmaf
+    - |
+      time meson setup `
+        --default-library static `
+        --buildtype release `
+        --libdir lib `
+        --prefix "$env:PREFIX_DIR" `
+        -Denable_tests=false `
+        -Denable_docs=false `
+        -Dbuilt_in_models=true `
+        -Denable_float=true `
+        vmaf-build vmaf-src/libvmaf
+      time meson install -C vmaf-build
+ 
+    # FFmpeg
+    # Uses ld=CXX for libvmaf to autolink the stdc++ library
+    - |
+      mkdir ffmpeg-build
+      cd ffmpeg-build
+      time bash ../ffmpeg-src/configure `
+        --arch=x86_64 `
+        --pkg-config-flags="--static" `
+        --cc="${env:CC}" `
+        --cxx="${env:CXX}" `
+        --ld="${env:CXX}" `
+        --enable-gpl --enable-static `
+        --prefix="$env:PREFIX_DIR" `
+        --enable-libaom `
+        --enable-libdav1d `
+        --enable-libsvtav1 `
+        --enable-libvmaf `
+        --enable-libvpx `
+        --disable-shared
+      time make -j $((Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors + 2) install
+      cp ./ffmpeg.exe $env:CI_PROJECT_DIR
+    - ccache -s
+  artifacts:
+    untracked: false
+    expire_in: 30 day
+    paths:
+      - ffmpeg.exe
