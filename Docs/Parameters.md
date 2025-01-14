@@ -355,7 +355,9 @@ Other options such as updating the Bitrate and resolution during the encoding se
 ### 1. Thread management parameters
 
 `PinnedExecution` (`--pin`) and `TargetSocket` (`--ss`) parameters are used to
-manage thread affinity on Windows and Ubuntu OS. `LevelOfParallelism` is used
+manage thread affinity on Windows and Ubuntu OS. `LogicalProcessors` (`LogicalProcessors`
+is deprecated in v3.0 and replaced with `LevelOfParallelism`; henceforth, the
+documentation will refer to 'LevelOfParallelsim` instead) is used
 to specify how much parallelism is desired; higher levels will create more threads
 and process more pictures in parallel, leading to greater fps but larger memory use.
 These are some examples how you use them together.
