@@ -101,7 +101,6 @@ extern "C" {
 // EbSvtAv1Enc.h
 #define FIX_BOOL                           1 // Replace Bool with the standard bool
 #define FIX_HIGH_DYNAMIC_RANGE_INPUT       1 // Remove high_dynamic_range_input as hdr is not supported
-#define FIX_TIER                           1 // Remove tier as only main tier is supported
 #define FIX_COLOR_DESCRIPTION_PRESENT_FLAG 1 // Remove color_description_present_flag as adding color description information is not supported
 #define FIX_RATE_CONTROL_MODE              1 // Use SvtAv1RcMode instead of uint32_t
 #define FIX_VBV_BUFSIZE                    1 // Remove vbv_bufsize as not used

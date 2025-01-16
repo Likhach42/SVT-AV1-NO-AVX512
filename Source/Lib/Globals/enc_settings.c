@@ -977,9 +977,7 @@ EbErrorType svt_av1_set_default_params(EbSvtAv1EncConfiguration *config_ptr) {
 
     // Annex A parameters
     config_ptr->profile = 0;
-#if !FIX_TIER
     config_ptr->tier = 0;
-#endif
     config_ptr->level = 0;
 
     // Latency
@@ -1062,7 +1060,6 @@ EbErrorType svt_av1_set_default_params(EbSvtAv1EncConfiguration *config_ptr) {
     config_ptr->variance_octile                   = 6;
     return return_error;
 }
-#if !FIX_TIER
 static const char *tier_to_str(unsigned in) {
     if (!in)
         return "(auto)";
@@ -1070,7 +1067,6 @@ static const char *tier_to_str(unsigned in) {
     snprintf(ret, 11, "%u", in);
     return ret;
 }
-#endif
 static const char *level_to_str(unsigned in) {
     if (!in)
         return "(auto)";
@@ -1087,15 +1083,6 @@ void svt_av1_print_lib_params(SequenceControlSet *scs) {
     if (config->pass == ENC_FIRST_PASS)
         SVT_INFO("SVT [config]: preset \t\t\t\t\t\t\t: Pass 1\n");
     else {
-#if FIX_TIER
-        SVT_INFO("SVT [config]: %s\t%s\tlevel %s\n",
-                 config->profile == MAIN_PROFILE               ? "main profile"
-                     : config->profile == HIGH_PROFILE         ? "high profile"
-                     : config->profile == PROFESSIONAL_PROFILE ? "professional profile"
-                                                               : "Unknown profile",
-                 "main tier",
-                 level_to_str(config->level));
-#else
         SVT_INFO("SVT [config]: %s\ttier %s\tlevel %s\n",
                  config->profile == MAIN_PROFILE               ? "main profile"
                      : config->profile == HIGH_PROFILE         ? "high profile"
@@ -1103,7 +1090,6 @@ void svt_av1_print_lib_params(SequenceControlSet *scs) {
                                                                : "Unknown profile",
                  tier_to_str(config->tier),
                  level_to_str(config->level));
-#endif
         SVT_INFO(
             "SVT [config]: width / height / fps numerator / fps denominator \t\t: %d / %d / %d / "
             "%d\n",
@@ -1985,9 +1971,7 @@ EB_API EbErrorType svt_av1_enc_parse_parameter(EbSvtAv1EncConfiguration *config_
         {"qp", &config_struct->qp},
         {"film-grain", &config_struct->film_grain_denoise_strength},
         {"hierarchical-levels", &config_struct->hierarchical_levels},
-#if !FIX_TIER
         {"tier", &config_struct->tier},
-#endif
         {"level", &config_struct->level},
 #if CLN_LP_LVLS
 #if FIX_SVT_AV1_CHECK_VERSION

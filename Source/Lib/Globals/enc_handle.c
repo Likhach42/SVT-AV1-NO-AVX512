@@ -5151,9 +5151,7 @@ static void copy_api_from_app(
 
     // Annex A parameters
     scs->static_config.profile = ((EbSvtAv1EncConfiguration*)config_struct)->profile;
-#if !FIX_TIER
     scs->static_config.tier = ((EbSvtAv1EncConfiguration*)config_struct)->tier;
-#endif
     scs->static_config.level = ((EbSvtAv1EncConfiguration*)config_struct)->level;
     scs->static_config.stat_report = ((EbSvtAv1EncConfiguration*)config_struct)->stat_report;
 

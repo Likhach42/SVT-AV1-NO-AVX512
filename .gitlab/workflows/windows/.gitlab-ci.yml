@@ -188,7 +188,7 @@ Win64 FFmpeg (Static):
         -Denable_float=true `
         vmaf-build vmaf-src/libvmaf
       time meson install -C vmaf-build
- 
+
     # FFmpeg
     # Uses ld=CXX for libvmaf to autolink the stdc++ library
     - |

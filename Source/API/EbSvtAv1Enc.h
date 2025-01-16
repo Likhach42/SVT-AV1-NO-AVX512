@@ -349,7 +349,6 @@ typedef struct EbSvtAv1EncConfiguration {
      * Default is MAIN_PROFILE.
      */
     EbAv1SeqProfile profile;
-#if !FIX_TIER
     /* Constraints for bitstream in terms of max bitrate and max buffer size.
      *
      * 0 = Main, for most applications.
@@ -357,7 +356,6 @@ typedef struct EbSvtAv1EncConfiguration {
      *
      * Default is 0. */
     uint32_t tier;
-#endif
     /**
      * @brief Bitstream level.
      * 0: autodetect from bitstream, 20: level 2.0, 63: level 6.3, only levels 2.0-6.3 are properly defined.

@@ -2,17 +2,6 @@ diff --git a/libavcodec/libsvtav1.c b/libavcodec/libsvtav1.c
 index 120ead71b7..df6978c97f 100644
 --- a/libavcodec/libsvtav1.c
 +++ b/libavcodec/libsvtav1.c
-@@ -156,8 +156,8 @@ static int config_enc_params(EbSvtAv1EncConfiguration *param,
- #if FF_API_SVTAV1_OPTS
-     if (svt_enc->hierarchical_level >= 0)
-         param->hierarchical_levels    = svt_enc->hierarchical_level;
--    if (svt_enc->tier >= 0)
--        param->tier                   = svt_enc->tier;
-+    // if (svt_enc->tier >= 0)
-+        // param->tier                   = svt_enc->tier;
-     if (svt_enc->scd >= 0)
-         param->scene_change_detection = svt_enc->scd;
-     if (svt_enc->tile_columns >= 0)
 @@ -382,7 +382,7 @@ static av_cold int eb_enc_init(AVCodecContext *avctx)
  
      svt_enc->eos_flag = EOS_NOT_REACHED;
