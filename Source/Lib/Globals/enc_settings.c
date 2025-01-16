@@ -977,8 +977,8 @@ EbErrorType svt_av1_set_default_params(EbSvtAv1EncConfiguration *config_ptr) {
 
     // Annex A parameters
     config_ptr->profile = 0;
-    config_ptr->tier = 0;
-    config_ptr->level = 0;
+    config_ptr->tier    = 0;
+    config_ptr->level   = 0;
 
     // Latency
     config_ptr->film_grain_denoise_strength = 0;
