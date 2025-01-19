@@ -320,9 +320,8 @@ struct AomDenoiseAndModel;
      * parameter will be true when the input buffer was successfully denoised and
      * grain was modelled. Returns false on error.
      *
-     * \param[in]      ctx   Struct allocated with svt_aom_denoise_and_model_alloc
-     *                       that holds some buffers for denoising and the current
-     *                       noise estimate.
+     * \param[in]       ctx  Struct that holds some buffers for denoising and the
+     *                       current noise estimate.
      * \param[in/out]   buf  The raw input buffer to be denoised.
      * \param[out]    grain  Output film grain parameters
      */
@@ -338,9 +337,6 @@ int32_t svt_aom_denoise_and_model_run(struct AomDenoiseAndModel *ctx, EbPictureB
      *                         higher levels of noise)
      */
 
-/*!\brief Frees the denoise context allocated with svt_aom_denoise_and_model_alloc
-      */
-void aom_denoise_and_model_free(struct AomDenoiseAndModel *denoise_model, int32_t use_highbd);
 
 int32_t is_ref_noise_model_different(AomNoiseModel *const noise_model, AomNoiseModel *const ref_noise_model);
 

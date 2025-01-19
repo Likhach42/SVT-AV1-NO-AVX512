@@ -2097,15 +2097,6 @@ int32_t svt_aom_wiener_denoise_2d(const uint8_t *const data[3], uint8_t *denoise
     return init_success;
 }
 
-EbErrorType svt_aom_denoise_and_model_alloc(AomDenoiseAndModel *ctx, int32_t bit_depth, int32_t block_size,
-                                            float noise_level) {
-    ctx->block_size  = block_size;
-    ctx->noise_level = noise_level;
-    ctx->bit_depth   = bit_depth;
-
-    return EB_ErrorNone;
-}
-
 static void denoise_and_model_dctor(EbPtr p) {
     AomDenoiseAndModel *obj = (AomDenoiseAndModel *)p;
 
@@ -2137,12 +2128,10 @@ EbErrorType svt_aom_denoise_and_model_ctor(AomDenoiseAndModel *object_ptr, EbPtr
     else if (input_resolution < INPUT_SIZE_8K_TH)
         denoise_block_size = 16;
 
-    return_error = svt_aom_denoise_and_model_alloc(object_ptr,
-                                                   init_data_ptr->encoder_bit_depth > EB_EIGHT_BIT ? 10 : 8,
-                                                   denoise_block_size,
-                                                   (float)(init_data_ptr->noise_level / 10.0));
-    if (return_error != EB_ErrorNone)
-        return return_error;
+    object_ptr->block_size  = denoise_block_size;
+    object_ptr->noise_level = (float)(init_data_ptr->noise_level / 10.0);
+    object_ptr->bit_depth   = init_data_ptr->encoder_bit_depth > EB_EIGHT_BIT ? 10 : 8;
+
     object_ptr->width     = init_data_ptr->width;
     object_ptr->height    = init_data_ptr->height;
     object_ptr->y_stride  = init_data_ptr->stride_y;
