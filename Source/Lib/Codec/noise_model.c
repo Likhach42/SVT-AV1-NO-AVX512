@@ -2129,9 +2129,17 @@ EbErrorType svt_aom_denoise_and_model_ctor(AomDenoiseAndModel *object_ptr, EbPtr
 
     object_ptr->dctor = denoise_and_model_dctor;
 
+    int32_t        denoise_block_size = 32;
+    const uint32_t input_resolution   = init_data_ptr->width * init_data_ptr->height;
+
+    if (input_resolution < INPUT_SIZE_4K_TH)
+        denoise_block_size = 8;
+    else if (input_resolution < INPUT_SIZE_8K_TH)
+        denoise_block_size = 16;
+
     return_error = svt_aom_denoise_and_model_alloc(object_ptr,
                                                    init_data_ptr->encoder_bit_depth > EB_EIGHT_BIT ? 10 : 8,
-                                                   DENOISING_BlockSize,
+                                                   denoise_block_size,
                                                    (float)(init_data_ptr->noise_level / 10.0));
     if (return_error != EB_ErrorNone)
         return return_error;
