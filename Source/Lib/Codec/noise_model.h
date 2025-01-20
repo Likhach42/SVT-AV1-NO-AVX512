@@ -337,7 +337,6 @@ int32_t svt_aom_denoise_and_model_run(struct AomDenoiseAndModel *ctx, EbPictureB
      *                         higher levels of noise)
      */
 
-
 int32_t is_ref_noise_model_different(AomNoiseModel *const noise_model, AomNoiseModel *const ref_noise_model);
 
 // Matrix multiply

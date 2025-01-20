@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "noise_model.h"
+#include "definitions.h"
+#include "sequence_control_set.h"
 #include "noise_util.h"
 #include "mathutils.h"
 #include "svt_log.h"
@@ -2113,6 +2115,7 @@ EbErrorType svt_aom_denoise_and_model_ctor(AomDenoiseAndModel *object_ptr, EbPtr
     DenoiseAndModelInitData *init_data_ptr = (DenoiseAndModelInitData *)object_init_data_ptr;
     EbErrorType              return_error  = EB_ErrorNone;
     uint32_t                 use_highbd    = init_data_ptr->encoder_bit_depth > EB_EIGHT_BIT ? 1 : 0;
+    EbInputResolution        input_resolution;
 
     int32_t chroma_sub_log2[2] = {1, 1}; //todo: send chroma subsampling
     chroma_sub_log2[0]         = (init_data_ptr->encoder_color_format == EB_YUV444 ? 0 : 1);
@@ -2120,12 +2123,13 @@ EbErrorType svt_aom_denoise_and_model_ctor(AomDenoiseAndModel *object_ptr, EbPtr
 
     object_ptr->dctor = denoise_and_model_dctor;
 
-    int32_t        denoise_block_size = 32;
-    const uint32_t input_resolution   = init_data_ptr->width * init_data_ptr->height;
+    const uint32_t input_size = init_data_ptr->width * init_data_ptr->height;
+    svt_aom_derive_input_resolution(&input_resolution, input_size);
 
-    if (input_resolution < INPUT_SIZE_4K_TH)
+    int32_t denoise_block_size = 32;
+    if (input_resolution <= INPUT_SIZE_1080p_RANGE)
         denoise_block_size = 8;
-    else if (input_resolution < INPUT_SIZE_8K_TH)
+    else if (input_resolution <= INPUT_SIZE_4K_RANGE)
         denoise_block_size = 16;
 
     object_ptr->block_size  = denoise_block_size;
