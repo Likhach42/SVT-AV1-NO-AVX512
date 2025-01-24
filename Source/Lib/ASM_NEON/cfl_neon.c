@@ -9,7 +9,9 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 #include <arm_neon.h>
+
 #include "definitions.h"
+#include "mem_neon.h"
 
 /* Store half of a vector. */
 static INLINE void vsth_u8(uint8_t *ptr, uint8x8_t val) { vst1_lane_u32((uint32_t *)ptr, vreinterpret_u32_u8(val), 0); }
@@ -183,6 +185,147 @@ void svt_cfl_predict_hbd_neon(const int16_t *pred_buf_q3, uint16_t *pred, int pr
                 vst1q_u16_x4(dst, clamp4q_s16(pred_v, max_16x8));
             }
             dst += dst_stride;
+            pred_buf_q3 += CFL_BUF_LINE;
+        } while (pred_buf_q3 < end);
+    }
+}
+
+void svt_cfl_luma_subsampling_420_lbd_neon(const uint8_t *input, int input_stride, int16_t *pred_buf_q3, int width,
+                                           int height) {
+    const int16_t *end         = pred_buf_q3 + (height >> 1) * CFL_BUF_LINE;
+    const int      luma_stride = input_stride << 1;
+    if (width == 4) {
+        do {
+            const uint8x8_t top = load_unaligned_u8(input, luma_stride);
+            const uint8x8_t bot = load_unaligned_u8(input + input_stride, luma_stride);
+            uint16x4_t      sum = vpaddl_u8(top);
+            sum                 = vpadal_u8(sum, bot);
+            sum                 = vadd_u16(sum, sum);
+
+            store_s16x2_strided_x2(pred_buf_q3, CFL_BUF_LINE, vreinterpret_s16_u16(sum));
+
+            input += 2 * luma_stride;
+            pred_buf_q3 += 2 * CFL_BUF_LINE;
+        } while (pred_buf_q3 < end);
+    } else if (width == 8) {
+        do {
+            uint8x16_t top = load_u8_8x2(input, luma_stride);
+            uint8x16_t bot = load_u8_8x2(input + input_stride, luma_stride);
+
+            uint16x8_t sum = vpaddlq_u8(top);
+            sum            = vpadalq_u8(sum, bot);
+            sum            = vaddq_u16(sum, sum);
+
+            store_s16x4_strided_x2(pred_buf_q3, CFL_BUF_LINE, vreinterpretq_s16_u16(sum));
+
+            input += 2 * luma_stride;
+            pred_buf_q3 += 2 * CFL_BUF_LINE;
+        } while (pred_buf_q3 < end);
+    } else if (width == 16) {
+        do {
+            const uint8x16_t top = vld1q_u8(input);
+            const uint8x16_t bot = vld1q_u8(input + input_stride);
+
+            uint16x8_t sum = vpaddlq_u8(top);
+            sum            = vpadalq_u8(sum, bot);
+            sum            = vaddq_u16(sum, sum);
+
+            vst1q_s16(pred_buf_q3, vreinterpretq_s16_u16(sum));
+
+            input += luma_stride;
+            pred_buf_q3 += CFL_BUF_LINE;
+        } while (pred_buf_q3 < end);
+    } else {
+        do {
+            const uint8x16x2_t top = vld1q_u8_x2(input);
+            const uint8x16x2_t bot = vld1q_u8_x2(input + input_stride);
+
+            uint16x8_t sum0 = vpaddlq_u8(top.val[0]);
+            uint16x8_t sum1 = vpaddlq_u8(top.val[1]);
+            sum0            = vpadalq_u8(sum0, bot.val[0]);
+            sum1            = vpadalq_u8(sum1, bot.val[1]);
+
+            sum0 = vaddq_u16(sum0, sum0);
+            sum1 = vaddq_u16(sum1, sum1);
+
+            vst1q_s16(pred_buf_q3 + 0, vreinterpretq_s16_u16(sum0));
+            vst1q_s16(pred_buf_q3 + 8, vreinterpretq_s16_u16(sum1));
+
+            input += luma_stride;
+            pred_buf_q3 += CFL_BUF_LINE;
+        } while (pred_buf_q3 < end);
+    }
+}
+
+void svt_cfl_luma_subsampling_420_hbd_neon(const uint16_t *input, int input_stride, int16_t *pred_buf_q3, int width,
+                                           int height) {
+    const int16_t *end         = pred_buf_q3 + (height >> 1) * CFL_BUF_LINE;
+    const int      luma_stride = input_stride << 1;
+    if (width == 4) {
+        do {
+            const uint16x8_t top = load_unaligned_u16_4x2(input, luma_stride);
+            const uint16x8_t bot = load_unaligned_u16_4x2(input + input_stride, luma_stride);
+
+            uint16x8_t sum = vaddq_u16(top, bot);
+            sum            = vpaddq_u16(sum, sum);
+            sum            = vaddq_u16(sum, sum);
+
+            store_s16x2_strided_x2(pred_buf_q3, CFL_BUF_LINE, vget_low_s16(vreinterpretq_s16_u16(sum)));
+
+            input += 2 * luma_stride;
+            pred_buf_q3 += 2 * CFL_BUF_LINE;
+        } while (pred_buf_q3 < end);
+    } else if (width == 8) {
+        do {
+            uint16x8_t top0, top1, bot0, bot1;
+            load_u16_8x2(input, luma_stride, &top0, &top1);
+            load_u16_8x2(input + input_stride, luma_stride, &bot0, &bot1);
+
+            uint16x8_t sum0  = vaddq_u16(top0, bot0);
+            uint16x8_t sum1  = vaddq_u16(top1, bot1);
+            uint16x8_t sum01 = vpaddq_u16(sum0, sum1);
+            sum01            = vaddq_u16(sum01, sum01);
+
+            store_s16x4_strided_x2(pred_buf_q3, CFL_BUF_LINE, vreinterpretq_s16_u16(sum01));
+
+            input += 2 * luma_stride;
+            pred_buf_q3 += 2 * CFL_BUF_LINE;
+        } while (pred_buf_q3 < end);
+    } else if (width == 16) {
+        do {
+            uint16x8_t top0, top1, bot0, bot1;
+            load_u16_8x2(input + 0, input_stride, &top0, &bot0);
+            load_u16_8x2(input + 8, input_stride, &top1, &bot1);
+
+            uint16x8_t sum0  = vaddq_u16(top0, bot0);
+            uint16x8_t sum1  = vaddq_u16(top1, bot1);
+            uint16x8_t sum01 = vpaddq_u16(sum0, sum1);
+            sum01            = vaddq_u16(sum01, sum01);
+
+            vst1q_s16(pred_buf_q3, vreinterpretq_s16_u16(sum01));
+
+            input += luma_stride;
+            pred_buf_q3 += CFL_BUF_LINE;
+        } while (pred_buf_q3 < end);
+    } else if (width == 32) {
+        do {
+            uint16x8_t top[4], bot[4];
+            load_u16_8x4(input, 8, &top[0], &top[1], &top[2], &top[3]);
+            load_u16_8x4(input + input_stride, 8, &bot[0], &bot[1], &bot[2], &bot[3]);
+
+            uint16x8_t sum0 = vaddq_u16(top[0], bot[0]);
+            uint16x8_t sum1 = vaddq_u16(top[1], bot[1]);
+            uint16x8_t sum2 = vaddq_u16(top[2], bot[2]);
+            uint16x8_t sum3 = vaddq_u16(top[3], bot[3]);
+
+            uint16x8_t sum01 = vpaddq_u16(sum0, sum1);
+            uint16x8_t sum23 = vpaddq_u16(sum2, sum3);
+            sum01            = vaddq_u16(sum01, sum01);
+            sum23            = vaddq_u16(sum23, sum23);
+
+            store_s16_8x2(pred_buf_q3, 8, vreinterpretq_s16_u16(sum01), vreinterpretq_s16_u16(sum23));
+
+            input += luma_stride;
             pred_buf_q3 += CFL_BUF_LINE;
         } while (pred_buf_q3 < end);
     }
