@@ -446,6 +446,14 @@ typedef struct PictureControlSet {
     Bool lossless[MAX_SEGMENTS];
     Bool mimic_only_tx_4x4;
 #endif
+#if OPT_FRAME_DLF
+    int64_t zero_filt_sse;
+    int64_t best_filt_sse;
+    int32_t dlf_dist_dev;
+#endif
+#if OPT_CDEF_ME_INFO
+    int32_t cdef_dist_dev;
+#endif
 } PictureControlSet;
 
 // To optimize based on the max input size
@@ -669,6 +677,55 @@ typedef struct GmControls {
     uint8_t qp_offset;
 } GmControls;
 #endif
+#if CLN_CDEF_LVLS
+typedef struct CdefSearchControls {
+    uint8_t enabled;
+    uint8_t number_of_prim_in_second_loop[2];
+    // Number of primary filters considered in the first pass. (luma and chroma)
+    uint8_t first_pass_fs_num;
+    // Primary filter strengths to consider in the first pass.
+    uint8_t default_first_pass_fs[TOTAL_STRENGTHS];
+    // Number of secondary filters considered in the second pass. (luma and chroma)
+    uint8_t default_second_pass_fs_num;
+    // Secondary filter strengths to consider in the second pass.
+    uint8_t default_second_pass_fs[TOTAL_STRENGTHS];
+    // Mask for primary filters to be considered for chroma and indicates a subset of the primary
+    // filter strengths considered in default_first_pass_fs[64]
+    int8_t default_first_pass_fs_uv[TOTAL_STRENGTHS];
+    // Mask for secondary filters to be considered for chroma and indicates a subset of the
+    // secondary filter strengths considered in default_second_pass_fs[64]
+    int8_t default_second_pass_fs_uv[TOTAL_STRENGTHS];
+    // Flag to indicate the use of reference frames' filter strengths.
+    int8_t use_reference_cdef_fs;
+    // Predicted filter strength pair index for the luma component based on reference picture filter
+    // strength pairs.
+    int8_t pred_y_f;
+    // Predicted filter strength pair index for the chroma component based on reference picture
+    // filter strength pairs.
+    int8_t pred_uv_f;
+    // Allowable levels: [1,2,4] ---> 1: no subsampling; 2: process every 2nd row; 4: process every
+    // 4th row for 8x8 blocks, every 2nd row for smaller sizes.
+    uint8_t subsampling_factor;
+    // NB subsampling is capped for certain block sizes, based on how many points the intrinsics can
+    // process at once. Only search best filter strengths of the nearest ref frames (skips the
+    // search if the filters of list0/list1 are the same).
+    uint8_t search_best_ref_fs;
+    // Shut CDEF at the picture level based on the skip area of the nearest reference frames.
+    uint8_t use_skip_detector;
+} CdefSearchControls;
+
+typedef struct CdefReconControls {
+    // 0: OFF, higher is safer. Scaling factor to decrease the zero filter strength cost: : <x>/64
+    uint16_t zero_fs_cost_bias;
+#if OPT_CDEF_ME_INFO
+    // Threshold used to disable based on ME distortion, there are four levels of thresholds [0..3], 0 = off
+    uint8_t zero_filter_strength_lvl;
+    // Only use zero_filter_strength_lvl if the CDEF improvement of the ref frames is below prev_cdef_dist_th.
+    // prev_cdef_dist_th is a percent times 10 (e.g. a value of 50 corresponds to 5% improvement in the ref frames).
+    uint16_t prev_cdef_dist_th;
+#endif
+} CdefReconControls;
+#else
 typedef struct CdefControls {
     uint8_t enabled;
     uint8_t number_of_prim_in_second_loop[2];
@@ -706,6 +763,7 @@ typedef struct CdefControls {
     // Shut CDEF at the picture level based on the skip area of the nearest reference frames.
     uint8_t use_skip_detector;
 } CdefControls;
+#endif
 typedef struct DlfCtrls {
     uint8_t enabled; // if true, perform DLF per SB, not per picture
     // when DLF filter level is selected from QP, if the filter level is less than or equal to this
@@ -713,12 +771,28 @@ typedef struct DlfCtrls {
     uint8_t sb_based_dlf;
     // Start search from average DLF instead of 0
     bool dlf_avg;
+#if OPT_FRAME_DLF
+    // If true, use average filter strength of ref frames for the current frame (no search). For luma, the filters
+    // may be set to 0 if the SSE improvement from DLF in the ref frames if very small
+    bool use_ref_avg_y;
+    bool use_ref_avg_uv;
+#else
     // Use average DLF as a starting point for qp based filter strength selection for Chroma planes
     bool dlf_avg_uv;
+#endif
     // Number of convergence points before exiting the filter search, 1 = exit on first convergence point, 2 = exit on second, 0 = off
     uint8_t early_exit_convergence;
+#if OPT_FRAME_DLF
+    // Threshold used to set filter strength to zero based on ME distortion, there are four levels of thresholds [0..3], 0 = off
+    uint8_t zero_filter_strength_lvl;
+    // For frame-based DLF search, only use zero_filter_strength_lvl if the DLF improvement of the ref frames is below prev_dlf_dist_th.
+    // prev_dlf_dist_th is a percent times 10 (e.g. a value of 50 corresponds to 5% improvement in the ref frames). This TH is not used
+    // for SB-based DLF because we do not currently compute the SSE for SB-based DLF.
+    uint16_t prev_dlf_dist_th;
+#else
     // Threshold used when sb_based_dlf is used to use filter strength zero, there are four levels of thresholds [0..3], 0 = off
     uint8_t zero_filter_strength_lvl;
+#endif
 } DlfCtrls;
 typedef struct IntraBCCtrls {
     // Shift for full_pixel_exhaustive search threshold:   0: No Shift   1:Shift to left by 1
@@ -1158,7 +1232,12 @@ typedef struct PictureParentControlSet {
     GM_LEVEL     gm_downsample_level;
     bool         gm_pp_enabled;
     bool         gm_pp_detected; //gm detection enabled at the pre-processing level
+#if CLN_CDEF_LVLS
+    CdefSearchControls cdef_search_ctrls;
+    CdefReconControls  cdef_recon_ctrls;
+#else
     CdefControls cdef_ctrls;
+#endif
     // RC related variables
     int         q_low;
     int         q_high;

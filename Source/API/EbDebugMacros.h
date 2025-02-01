@@ -96,6 +96,7 @@ extern "C" {
 #define FIX_FAST_PRESET             1 // Tuning for high presets
 #define TUNE_FD0_FEATS              1 // Unify CDEF and DLF levels of fd2/fd0 in M10 and M9
 #define OPT_CDEF_FD1                1 // Opt CDEF for fd1
+
 #define FIX_PUBLIC_HEADER           1
 #if FIX_PUBLIC_HEADER
 // EbSvtAv1Enc.h
@@ -115,6 +116,34 @@ extern "C" {
 #define FIX_SVT_AV1_CHECK_VERSION          1 // Remove the SVT_AV1_CHECK_VERSION instances
 #define FIX_NO_ENCDEC                      1 // Remove REMOVE_LP1_LPN_DIFF as not used
 #define FIX_REMOVE_LP1_LPN_DIFF            1 // remove NO_ENCDEC as not used
+
+#define CLN_CDEF_LVLS               1 // Cleanup CDEF levels
+#define OPT_M5_CDEF                 1 // Tune M5 CDEF level
+#define OPT_FD2                     1 // cdef-subpel-mfmv
+#define OPT_FRAME_DLF               1 // Optimize the frame-level DLF search
+#define TUNE_M5_SVT14               1 // Tune M5
+#define OPT_MFMV                    1 // Use r0 for mfmv derivation
+#define OPT_CDEF_ME_INFO            1 // Use ME distortion to skip CDEF
+#define TUNE_M5_SVT_14_2            1 // Tune M5 (cyan, light grey)
+#define OPT_FP_BIAS                 1 // fp-bias = f(preset)
+#define OPT_DEPTHS                  1 // Tune depth level
+#define TUNE_M8_SVT_14_2            1 // Tune M8 (VLITT)
+#define TUNE_M9_SVT_14_2            1 // Tune M9 (VLITT) asumes TUNE_M8_SVT_14_2 is 1
+#define TUNE_LAMBDA_WEIGHT_M10      1 // Enable lambda weight in M10
+#define TUNE_MFMV_FD1               1 // Tune MFMV level for fd1
+#define TUNE_M6_SVT_14              1 // Tune M6
+#define TUNE_4K                     1 // Enable MFMV in 4K and tune M9 lpd1 level
+#define TUNE_LD_SVT_14              1 // Tune LD
+#define FIX_MOTION_REFN             1 // Check that refined motion modes are valid
+#define FIX_MV_PREC_CHECK           1 // Fix range of valid MV diff check
+#define FIX_RMV_SB128               1 // Fix assumptions that SB size is 64 when rmv is on
+#define FIX_CHECK_RMV_NEW_NR        1 // Check MV bounds when rmv is enabled for NEW_NEAR/NEAR_NEW candidates
+#define TUNE_M4_SVT_14_1            1 // Tune M4
+#define TUNE_M3_SVT_14_1            1 // Tune M3
+#define TUNE_FD1_LVL                1 // Position fd1 between fd0 and fd2
+#define TUNE_M10_SVT_14             1 // Tune M10 (VLITT)
+#define CLN_REM_RMV                 1 // Remove support for rmv (--rmv)
+
 //FOR DEBUGGING - Do not remove
 #define OPT_LD_LATENCY2         1 // Latency optimization for low delay - to keep the Macro for backwards testing until 3.0
 #define LOG_ENC_DONE            0 // log encoder job one

@@ -4556,11 +4556,13 @@ static void set_param_based_on_input(SequenceControlSet *scs)
     if (scs->static_config.variance_boost_strength >= 4) {
         SVT_WARN("Aggressive variance boost strength used. This is a curve that's only useful under specific situations. Use with caution!\n");
     }
+#if !CLN_REM_RMV
     // scs->static_config.hierarchical_levels = (scs->static_config.rate_control_mode > 1) ? 3 : scs->static_config.hierarchical_levels;
     if (scs->static_config.restricted_motion_vector && scs->super_block_size == 128) {
         scs->static_config.restricted_motion_vector = FALSE;
         SVT_WARN("Restricted_motion_vector and SB 128x128 not supoorted, setting rmv to false\n");
     }
+#endif
     if (scs->static_config.intra_refresh_type == SVT_AV1_FWDKF_REFRESH && scs->static_config.hierarchical_levels != 4){
         scs->static_config.hierarchical_levels = 4;
         SVT_WARN("Fwd key frame is only supported for hierarchical levels 4 at this point. Hierarchical levels are set to 4\n");
@@ -4698,7 +4700,11 @@ static void set_param_based_on_input(SequenceControlSet *scs)
     uint8_t list0_only_base_lvl = 0;
     if (scs->static_config.enc_mode <= ENC_M3)
         list0_only_base_lvl = 0;
+#if TUNE_M5_SVT14
+    else if (scs->static_config.enc_mode <= ENC_M4)
+#else
     else if (scs->static_config.enc_mode <= ENC_M5)
+#endif
         list0_only_base_lvl = 3;
     else if (scs->static_config.enc_mode <= ENC_M6)
         list0_only_base_lvl = 4;
@@ -5004,8 +5010,9 @@ static void copy_api_from_app(
             }
         }
     }
-
+#if !CLN_REM_RMV
     scs->static_config.restricted_motion_vector = ((EbSvtAv1EncConfiguration*)config_struct)->restricted_motion_vector;
+#endif
 
     // Rate Control
     scs->static_config.scene_change_detection = ((EbSvtAv1EncConfiguration*)config_struct)->scene_change_detection;
@@ -5508,8 +5515,8 @@ static EbErrorType downsample_copy_frame_buffer(
         uint16_t     source_cb_stride = (uint16_t)(input_ptr->cb_stride);
         const uint8_t  subsampling_x = (input_pic->color_format == EB_YUV444 ? 0 : 1);
         const uint8_t  subsampling_y = ((input_pic->color_format == EB_YUV444 || input_pic->color_format == EB_YUV422) ? 0 : 1);
-        const uint64_t chroma_width = (luma_width + subsampling_x) >> subsampling_x;
-        const uint64_t chroma_height = (luma_height + subsampling_y) >> subsampling_y;
+        const uint32_t chroma_width = (luma_width + subsampling_x) >> subsampling_x;
+        const uint32_t chroma_height = (luma_height + subsampling_y) >> subsampling_y;
 
         uint8_t *src = input_ptr->luma;
         uint8_t *dst = y8b_input_picture_ptr->buffer_y + luma_buffer_offset;
@@ -5549,7 +5556,7 @@ static EbErrorType downsample_copy_frame_buffer(
         }
     } else { // 10bit packed
 
-    uint32_t luma_offset = 0;
+        uint32_t luma_offset = 0;
         uint32_t luma_buffer_offset = (input_pic->stride_y*scs->top_padding + scs->left_padding);
         uint32_t chroma_buffer_offset = (input_pic->stride_cr*(scs->top_padding >> 1) + (scs->left_padding >> 1));
         uint16_t luma_width = (uint16_t)(input_pic->width - scs->max_input_pad_right);
@@ -5560,8 +5567,8 @@ static EbErrorType downsample_copy_frame_buffer(
         uint16_t source_cb_stride = (uint16_t)(input_ptr->cb_stride);
         const uint8_t  subsampling_x = (input_pic->color_format == EB_YUV444 ? 0 : 1);
         const uint8_t  subsampling_y = ((input_pic->color_format == EB_YUV444 || input_pic->color_format == EB_YUV422) ? 0 : 1);
-        const uint64_t chroma_width = (luma_width + subsampling_x) >> subsampling_x;
-        const uint64_t chroma_height = (luma_height + subsampling_y) >> subsampling_y;
+        const uint32_t chroma_width = (luma_width + subsampling_x) >> subsampling_x;
+        const uint32_t chroma_height = (luma_height + subsampling_y) >> subsampling_y;
 
         downsample_2d_c_16_zero2bit_skipall(
             (uint16_t*)(uint16_t*)(input_ptr->luma + luma_offset),
@@ -5677,8 +5684,8 @@ static EbErrorType copy_frame_buffer(
 
         const uint8_t subsampling_x = (input_pic->color_format == EB_YUV444 ? 0 : 1);
         const uint8_t subsampling_y = ((input_pic->color_format == EB_YUV444 || input_pic->color_format == EB_YUV422) ? 0 : 1);
-        const uint64_t chroma_width = (luma_width + subsampling_x) >> subsampling_x;
-        const uint64_t chroma_height = (luma_height + subsampling_y) >> subsampling_y;
+        const uint32_t chroma_width = (luma_width + subsampling_x) >> subsampling_x;
+        const uint32_t chroma_height = (luma_height + subsampling_y) >> subsampling_y;
 
         uint32_t comp_stride_y = input_pic->stride_y / 4;
         uint32_t comp_luma_buffer_offset = comp_stride_y * input_pic->org_y + input_pic->org_x/4;
@@ -5868,12 +5875,12 @@ static void memset_input_buffer(SequenceControlSet* scs, EbBufferHeaderType* dst
             EbPictureBufferDesc* input_pic = (EbPictureBufferDesc*)dst->p_buffer;
             EbSvtAv1EncConfiguration* config = &scs->static_config;
             Bool is_16bit_input = (Bool)(config->encoder_bit_depth > EB_EIGHT_BIT);
-            const uint8_t subsampling_x = (config->encoder_color_format == EB_YUV444 ? 0 : 1);
-            const uint8_t subsampling_y = ((config->encoder_color_format == EB_YUV444 || config->encoder_color_format == EB_YUV422) ? 0 : 1);
-            const size_t chroma_width = (input_pic->max_width + subsampling_x) >> subsampling_x;
-            const size_t chroma_height = (input_pic->max_height + subsampling_y) >> subsampling_y;
-            const size_t chroma_org_x = (input_pic->org_x + subsampling_x) >> subsampling_x;
-            const size_t chroma_org_y = (input_pic->org_y + subsampling_y) >> subsampling_y;
+            const uint8_t subsampling_x  = (config->encoder_color_format == EB_YUV444 ? 0 : 1);
+            const uint8_t subsampling_y  = ((config->encoder_color_format == EB_YUV444 || config->encoder_color_format == EB_YUV422) ? 0 : 1);
+            const uint32_t chroma_width  = (input_pic->max_width + subsampling_x) >> subsampling_x;
+            const uint32_t chroma_height = (input_pic->max_height + subsampling_y) >> subsampling_y;
+            const uint32_t chroma_org_x  = (input_pic->org_x + subsampling_x) >> subsampling_x;
+            const uint32_t chroma_org_y  = (input_pic->org_y + subsampling_y) >> subsampling_y;
 
             uint32_t y8b_input_size = ((y8b_input_picture_ptr->max_width + (y8b_input_picture_ptr->org_x << 1)) * (y8b_input_picture_ptr->max_height + (y8b_input_picture_ptr->org_y << 1)));
             memset(y8b_input_picture_ptr->buffer_y, 0, (y8b_input_size * sizeof(uint8_t)));
@@ -5898,12 +5905,12 @@ static void memset_input_buffer(SequenceControlSet* scs, EbBufferHeaderType* dst
             EbPictureBufferDesc* input_pic = (EbPictureBufferDesc*)dst->p_buffer;
             EbSvtAv1EncConfiguration* config = &scs->static_config;
             Bool is_16bit_input = (Bool)(config->encoder_bit_depth > EB_EIGHT_BIT);
-            const uint8_t subsampling_x = (config->encoder_color_format == EB_YUV444 ? 0 : 1);
-            const uint8_t subsampling_y = ((config->encoder_color_format == EB_YUV444 || config->encoder_color_format == EB_YUV422) ? 0 : 1);
-            const size_t chroma_width = (input_pic->max_width + subsampling_x) >> subsampling_x;
-            const size_t chroma_height = (input_pic->max_height + subsampling_y) >> subsampling_y;
-            const size_t chroma_org_x = (input_pic->org_x + subsampling_x) >> subsampling_x;
-            const size_t chroma_org_y = (input_pic->org_y + subsampling_y) >> subsampling_y;
+            const uint8_t subsampling_x  = (config->encoder_color_format == EB_YUV444 ? 0 : 1);
+            const uint8_t subsampling_y  = ((config->encoder_color_format == EB_YUV444 || config->encoder_color_format == EB_YUV422) ? 0 : 1);
+            const uint32_t chroma_width  = (input_pic->max_width + subsampling_x) >> subsampling_x;
+            const uint32_t chroma_height = (input_pic->max_height + subsampling_y) >> subsampling_y;
+            const uint32_t chroma_org_x  = (input_pic->org_x + subsampling_x) >> subsampling_x;
+            const uint32_t chroma_org_y  = (input_pic->org_y + subsampling_y) >> subsampling_y;
 
             uint32_t y8b_input_size = ((y8b_input_picture_ptr->max_width + (y8b_input_picture_ptr->org_x << 1))* (y8b_input_picture_ptr->max_height + (y8b_input_picture_ptr->org_y << 1)));
             memset(y8b_input_picture_ptr->buffer_y, 0, (y8b_input_size * sizeof(uint8_t)));
