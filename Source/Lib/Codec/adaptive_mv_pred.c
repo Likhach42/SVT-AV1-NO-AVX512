@@ -1909,7 +1909,6 @@ int svt_aom_is_dv_valid(const MV dv, const MacroBlockD *xd, int mi_row, int mi_c
     return 1;
 }
 
-
 IntMv svt_av1_get_ref_mv_from_stack(int ref_idx, const MvReferenceFrame *ref_frame, int ref_mv_idx,
                                     CandidateMv ref_mv_stack[][MAX_REF_MV_STACK_SIZE], MacroBlockD *xd
                                     /*const MB_MODE_INFO_EXT *mbmi_ext*/) {

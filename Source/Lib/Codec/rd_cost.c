@@ -1891,8 +1891,8 @@ uint64_t svt_aom_tx_size_bits(PictureControlSet *pcs, uint8_t segment_id, MdRate
                               uint8_t skip, FRAME_CONTEXT *ec_ctx, uint8_t allow_update_cdf) {
     uint64_t bits        = 0;
     int      is_inter_tx = is_inter_block(&mbmi->block_mi);
-    if (tx_mode == TX_MODE_SELECT && block_signals_txsize(bsize) &&
-        !(is_inter_tx && skip) && !svt_av1_is_lossless_segment(pcs, segment_id)) {
+    if (tx_mode == TX_MODE_SELECT && block_signals_txsize(bsize) && !(is_inter_tx && skip) &&
+        !svt_av1_is_lossless_segment(pcs, segment_id)) {
         if (is_inter_tx) { // This implies skip flag is 0.
             const TxSize max_tx_size = get_vartx_max_txsize(/*xd,*/ bsize, 0);
             const int    txbh        = tx_size_high_unit[max_tx_size];
@@ -1942,18 +1942,17 @@ uint64_t svt_aom_get_tx_size_bits(ModeDecisionCandidateBuffer *candidateBuffer, 
     mbmi->block_mi.ref_frame[0] = candidateBuffer->cand->ref_frame_type;
     mbmi->block_mi.tx_depth     = tx_depth;
 
-    const uint64_t bits = svt_aom_tx_size_bits(
-        pcs,
-        ctx->blk_ptr->segment_id,
-        ctx->md_rate_est_ctx,
-        xd,
-        mbmi,
-        ctx->blk_geom->txsize[tx_depth],
-        tx_mode,
-        bsize,
-        !block_has_coeff,
-        NULL,
-        0);
+    const uint64_t bits = svt_aom_tx_size_bits(pcs,
+                                               ctx->blk_ptr->segment_id,
+                                               ctx->md_rate_est_ctx,
+                                               xd,
+                                               mbmi,
+                                               ctx->blk_geom->txsize[tx_depth],
+                                               tx_mode,
+                                               bsize,
+                                               !block_has_coeff,
+                                               NULL,
+                                               0);
     return bits;
 }
 

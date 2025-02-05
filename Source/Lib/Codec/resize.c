@@ -1053,7 +1053,6 @@ EbErrorType svt_aom_resize_frame(const EbPictureBufferDesc *src, EbPictureBuffer
     return EB_ErrorNone;
 }
 
-
 // Compute the horizontal frequency components' energy in a frame
 // by calculuating the 16x4 Horizontal DCT. This is to be used to
 // decide the superresolution parameters.
@@ -1363,9 +1362,9 @@ void scale_pcs_params(SequenceControlSet *scs, PictureParentControlSet *pcs, sup
     pcs->picture_sb_height = picture_sb_height;
 
     // number of b64s
-    const uint16_t picture_b64_width = (uint16_t)((aligned_width + scs->b64_size - 1) / scs->b64_size);
+    const uint16_t picture_b64_width  = (uint16_t)((aligned_width + scs->b64_size - 1) / scs->b64_size);
     const uint16_t picture_b64_height = (uint16_t)((aligned_height + scs->b64_size - 1) / scs->b64_size);
-    pcs->b64_total_count = picture_b64_width * picture_b64_height;
+    pcs->b64_total_count              = picture_b64_width * picture_b64_height;
 
     // mi params
     cm->mi_stride = picture_sb_width * (scs->sb_size >> MI_SIZE_LOG2);

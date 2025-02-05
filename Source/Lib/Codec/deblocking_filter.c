@@ -1106,7 +1106,7 @@ void svt_av1_pick_filter_level_by_q(PictureControlSet *pcs, uint8_t qindex, int3
         filt_guess -= 4;
 
     int32_t filt_guess_chroma = filt_guess / 2;
-    bool do_y = true, do_uv = true;
+    bool    do_y = true, do_uv = true;
     // Don't use prev_dlf_dist_th b/c deriving the filter strength from QP is mainly used for SB-based DLF and we do not compute the
     // SSE in that path.
     me_based_dlf_skip(pcs, 0, &do_y, &do_uv);

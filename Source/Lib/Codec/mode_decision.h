@@ -237,7 +237,7 @@ struct CodingLoopContext_s;
 extern MvReferenceFrame svt_get_ref_frame_type(uint8_t list, uint8_t ref_idx);
 int                     svt_aom_get_sad_per_bit(int qidx, EbBitDepth is_hbd);
 
-int svt_av1_allow_palette(int allow_palette, BlockSize bsize);
+int  svt_av1_allow_palette(int allow_palette, BlockSize bsize);
 bool svt_av1_is_lossless_segment(PictureControlSet *pcs, int8_t segment_id);
 #ifdef __cplusplus
 }

@@ -154,8 +154,12 @@ class RansacTest : public ::testing::TestWithParam<TransformationType> {
         }
 
         bool mem_alloc_failed = false;
-        bool ret = svt_aom_ransac(
-            (Correspondence*)points, npoints, GetParam(), motions, num_motions, &mem_alloc_failed);
+        bool ret = svt_aom_ransac((Correspondence *)points,
+                                  npoints,
+                                  GetParam(),
+                                  motions,
+                                  num_motions,
+                                  &mem_alloc_failed);
         ASSERT_EQ(ret, true);
 
         /** check for the number of inlier */

@@ -787,8 +787,8 @@ void finish_cdef_search(PictureControlSet *pcs) {
         frm_hdr->cdef_params.cdef_bits = 0;
         ppcs->nb_cdef_strengths        = 1;
         //cdef_pri_damping & cdef_sec_damping consolidated to cdef_damping
-        int32_t pri_damping               = 3 + (frm_hdr->quantization_params.base_q_idx >> 6);
-        frm_hdr->cdef_params.cdef_damping = pri_damping;
+        int32_t pri_damping                      = 3 + (frm_hdr->quantization_params.base_q_idx >> 6);
+        frm_hdr->cdef_params.cdef_damping        = pri_damping;
         frm_hdr->cdef_params.cdef_y_strength[0]  = cdef_search_ctrls->pred_y_f;
         frm_hdr->cdef_params.cdef_uv_strength[0] = cdef_search_ctrls->pred_uv_f;
         free(sb_index);
@@ -845,7 +845,7 @@ void finish_cdef_search(PictureControlSet *pcs) {
     // When off, can save the cost of the application.
     if (cdef_recon_ctrls->zero_fs_cost_bias) {
         const Bool is_16bit = (pcs->scs->static_config.encoder_bit_depth > EB_EIGHT_BIT);
-        uint16_t factor;
+        uint16_t   factor;
         for (i = 0; i < sb_count; i++) {
             if (is_16bit) {
                 factor = cdef_recon_ctrls->zero_fs_cost_bias;
@@ -909,7 +909,7 @@ void finish_cdef_search(PictureControlSet *pcs) {
         }
     }
     pcs->cdef_dist_dev = zero_cost == 0 ? 0 : (int32_t)(1000 - ((1000 * best_tot_mse) / zero_cost));
-    nb_strengths = 1 << nb_strength_bits;
+    nb_strengths       = 1 << nb_strength_bits;
 
     frm_hdr->cdef_params.cdef_bits = nb_strength_bits;
     ppcs->nb_cdef_strengths        = nb_strengths;

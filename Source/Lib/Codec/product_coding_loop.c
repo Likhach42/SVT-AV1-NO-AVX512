@@ -5791,7 +5791,7 @@ static uint8_t do_md_recon(PictureParentControlSet *pcs, ModeDecisionContext *ct
     uint8_t need_md_rec_for_intra_pred = !ctxt->skip_intra; // for intra prediction of current frame
     uint8_t need_md_rec_for_ref        = (pcs->is_ref || pcs->scs->static_config.recon_enabled) &&
         encdec_bypass; // for inter prediction of future frame or if recon is being output
-    uint8_t need_md_rec_for_dlf_search = pcs->dlf_ctrls.enabled; // for DLF levels
+    uint8_t need_md_rec_for_dlf_search  = pcs->dlf_ctrls.enabled; // for DLF levels
     uint8_t need_md_rec_for_cdef_search = pcs->cdef_search_ctrls.enabled &&
         !pcs->cdef_search_ctrls.use_reference_cdef_fs; // CDEF search levels needing the recon samples
     uint8_t need_md_rec_for_restoration_search = pcs->enable_restoration; // any resoration search level
@@ -6792,12 +6792,12 @@ static void md_stage_2(PictureControlSet *pcs, ModeDecisionContext *ctx, EbPictu
         ModeDecisionCandidateBuffer *cand_bf        = cand_bf_ptr_array[candidateIndex];
         ModeDecisionCandidate       *cand           = cand_bf->cand;
         ctx->mds_tx_size_mode                       = 0;
-        ctx->mds_txt_level = svt_av1_is_lossless_segment(pcs, ctx->blk_ptr->segment_id) ? 0
-            : is_intra_mode(cand->pred_mode)                                            ? ctx->txt_ctrls.enabled
-                                                                                        : 0;
-        ctx->mds_skip_rdoq            = is_intra_mode(cand->pred_mode) ? TRUE : FALSE;
-        ctx->mds_skip_full_uv         = TRUE;
-        ctx->mds_spatial_sse          = ctx->spatial_sse_ctrls.spatial_sse_full_loop_level;
+        ctx->mds_txt_level                          = svt_av1_is_lossless_segment(pcs, ctx->blk_ptr->segment_id) ? 0
+                                     : is_intra_mode(cand->pred_mode) ? ctx->txt_ctrls.enabled
+                                                                      : 0;
+        ctx->mds_skip_rdoq                          = is_intra_mode(cand->pred_mode) ? TRUE : FALSE;
+        ctx->mds_skip_full_uv                       = TRUE;
+        ctx->mds_spatial_sse                        = ctx->spatial_sse_ctrls.spatial_sse_full_loop_level;
         ctx->mds_fast_coeff_est_level = (ctx->pd_pass == PD_PASS_1) ? 1 : ctx->rate_est_ctrls.pd0_fast_coeff_est_level;
         ctx->mds_subres_step          = (ctx->pd_pass == PD_PASS_1) ? 0 : ctx->subres_ctrls.step;
 
@@ -6915,7 +6915,7 @@ static void md_stage_3(PictureControlSet *pcs, ModeDecisionContext *ctx, EbPictu
         ctx->mds_skip_ifs = (ctx->ifs_ctrls.level == IFS_MDS3) ? FALSE : TRUE;
 
         ctx->mds_tx_size_mode = ctx->txs_ctrls.enabled && (ctx->blk_geom->sq_size >= ctx->txs_ctrls.min_sq_size);
-        ctx->mds_txt_level = svt_av1_is_lossless_segment(pcs, ctx->blk_ptr->segment_id) ? 0 : ctx->txt_ctrls.enabled;
+        ctx->mds_txt_level    = svt_av1_is_lossless_segment(pcs, ctx->blk_ptr->segment_id) ? 0 : ctx->txt_ctrls.enabled;
         ctx->mds_skip_full_uv = FALSE;
 
         ctx->mds_skip_rdoq = FALSE;
@@ -8782,11 +8782,11 @@ static void md_encode_block_light_pd1(PictureControlSet *pcs, ModeDecisionContex
             ctx->lpd1_allow_skipping_tx = 1;
         }
     } else {
-        cand_bf                     = cand_bf_ptr_array_base[0];
-        cand_bf->cand               = &fast_cand_array[0];
-        *(cand_bf->fast_cost)       = 0;
-        cand_bf->fast_luma_rate     = 0;
-        cand_bf->fast_chroma_rate   = 0;
+        cand_bf                   = cand_bf_ptr_array_base[0];
+        cand_bf->cand             = &fast_cand_array[0];
+        *(cand_bf->fast_cost)     = 0;
+        cand_bf->fast_luma_rate   = 0;
+        cand_bf->fast_chroma_rate = 0;
 
         /* If the interpolation filter type is assigned at the picture level, use that value, OW use regular.
          * NB intra_bc always uses BILINEAR, but IBC is not allowed in LPD1. */

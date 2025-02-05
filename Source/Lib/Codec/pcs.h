@@ -442,8 +442,8 @@ typedef struct PictureControlSet {
     EbPictureBufferDesc *scaled_input_pic;
     bool                 rtc_tune;
     // lossless[s] is true if segment 's' is coded losslessly.
-    Bool lossless[MAX_SEGMENTS];
-    Bool mimic_only_tx_4x4;
+    Bool    lossless[MAX_SEGMENTS];
+    Bool    mimic_only_tx_4x4;
     int64_t zero_filt_sse;
     int64_t best_filt_sse;
     int32_t dlf_dist_dev;
@@ -795,9 +795,9 @@ typedef struct PictureParentControlSet {
     int8_t    transition_present; // -1: not computed
     Bool      end_of_sequence_flag;
     uint8_t   picture_qp;
-    uint32_t tot_qindex;
-    uint32_t valid_qindex_area;
-    uint8_t  avg_qp;
+    uint32_t  tot_qindex;
+    uint32_t  valid_qindex_area;
+    uint8_t   avg_qp;
     uint64_t  picture_number;
     uint32_t  cur_order_hint;
     uint32_t  ref_order_hint[INTER_REFS_PER_FRAME];
@@ -1099,13 +1099,13 @@ typedef struct PictureParentControlSet {
     uint8_t used_tpl_frame_num;
 
     // Tune TPL for better chroma.Only for 240P
-    uint8_t      tune_tpl_for_chroma;
-    uint8_t      is_not_scaled;
-    TfControls   tf_ctrls;
-    GmControls   gm_ctrls;
-    GM_LEVEL     gm_downsample_level;
-    bool         gm_pp_enabled;
-    bool         gm_pp_detected; //gm detection enabled at the pre-processing level
+    uint8_t            tune_tpl_for_chroma;
+    uint8_t            is_not_scaled;
+    TfControls         tf_ctrls;
+    GmControls         gm_ctrls;
+    GM_LEVEL           gm_downsample_level;
+    bool               gm_pp_enabled;
+    bool               gm_pp_detected; //gm detection enabled at the pre-processing level
     CdefSearchControls cdef_search_ctrls;
     CdefReconControls  cdef_recon_ctrls;
     // RC related variables
@@ -1181,7 +1181,7 @@ typedef struct PictureParentControlSet {
     bool     seq_param_changed;
     uint64_t norm_me_dist;
     uint8_t  tpl_params_ready;
-    bool is_startup_gop;
+    bool     is_startup_gop;
 
 } PictureParentControlSet;
 

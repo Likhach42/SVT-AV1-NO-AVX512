@@ -4516,8 +4516,8 @@ static EbErrorType av1_code_tx_size(PictureControlSet *pcs, int segment_id, FRAM
     int         is_inter_tx  = is_inter_block(&mbmi->block_mi) || is_intrabc_block(&mbmi->block_mi);
     //int skip = mbmi->skip;
     //int segment_id = 0;// mbmi->segment_id;
-    if (tx_mode == TX_MODE_SELECT && block_signals_txsize(bsize) &&
-        !(is_inter_tx && skip) && !svt_av1_is_lossless_segment(pcs, segment_id)) {
+    if (tx_mode == TX_MODE_SELECT && block_signals_txsize(bsize) && !(is_inter_tx && skip) &&
+        !svt_av1_is_lossless_segment(pcs, segment_id)) {
         if (is_inter_tx) { // This implies skip flag is 0.
             const TxSize max_tx_size = get_vartx_max_txsize(/*xd,*/ bsize, 0);
             const int    txbh        = tx_size_high_unit[max_tx_size];
@@ -4614,8 +4614,8 @@ static void code_tx_size(PictureControlSet *pcs, uint32_t blk_org_x, uint32_t bl
     const MbModeInfo *const mbmi = &xd->mi[0]->mbmi;
     xd->above_txfm_context       = &txfm_context_array->top_array[txfm_context_above_index];
     xd->left_txfm_context        = &txfm_context_array->left_array[txfm_context_left_index];
-    TxSize tx_size = blk_geom->txsize[mbmi->block_mi.tx_depth]; // inherit tx_size from 1st transform block;
-    FrameHeader             *frm_hdr          = &pcs->ppcs->frm_hdr;
+    TxSize       tx_size = blk_geom->txsize[mbmi->block_mi.tx_depth]; // inherit tx_size from 1st transform block;
+    FrameHeader *frm_hdr = &pcs->ppcs->frm_hdr;
     SegmentationNeighborMap *segmentation_map = pcs->segmentation_neighbor_map;
     av1_code_tx_size(pcs,
                      frm_hdr->segmentation_params.segmentation_enabled

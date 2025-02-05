@@ -1111,8 +1111,8 @@ void *svt_aom_resource_coordination_kernel(void *input_ptr) {
                 pcs->picture_qp    = (uint8_t)scs->static_config.qp;
             }
             // Initialize variables for calculating the average QP
-            pcs->tot_qindex        = 0;
-            pcs->valid_qindex_area = 0;
+            pcs->tot_qindex               = 0;
+            pcs->valid_qindex_area        = 0;
             pcs->ts_duration              = (double)10000000 * (1 << 16) / scs->frame_rate;
             scs->enc_ctx->initial_picture = FALSE;
 

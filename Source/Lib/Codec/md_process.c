@@ -153,7 +153,7 @@ EbErrorType svt_aom_mode_decision_context_ctor(ModeDecisionContext *ctx, EbColor
         bool rtc_tune = (bool)rtc_itr;
         for (uint8_t is_base = 0; is_base < 2; is_base++) {
             for (uint8_t qp = MIN_QP_VALUE; qp <= MAX_QP_VALUE; qp++) {
-                uint8_t nic_level = svt_aom_get_nic_level(enc_mode, is_base, qp, seq_qp_mod, rtc_tune);
+                uint8_t nic_level         = svt_aom_get_nic_level(enc_mode, is_base, qp, seq_qp_mod, rtc_tune);
                 uint8_t nic_scaling_level = svt_aom_set_nic_controls(NULL, nic_level);
                 min_nic_scaling_level     = MIN(min_nic_scaling_level, nic_scaling_level);
             }

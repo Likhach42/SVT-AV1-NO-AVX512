@@ -17,7 +17,6 @@
 
 #define DIVIDE_AND_ROUND(x, y) (((x) + ((y) >> 1)) / (y))
 
-
 #define AV1_K_MEANS_RENAME(func, dim) func##_dim##dim##_c
 
 void AV1_K_MEANS_RENAME(svt_av1_calc_indices, 1)(const int *data, const int *centroids, uint8_t *indices, int n, int k);

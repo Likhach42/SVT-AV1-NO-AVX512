@@ -95,10 +95,10 @@ void *svt_aom_dlf_kernel(void *input_ptr) {
         }
         // Initialize dev to negative value to indicate it was not computed.
         // SB-based DLF does not compute the distortion
-        pcs->zero_filt_sse   = -1;
-        pcs->best_filt_sse   = -1;
-        pcs->dlf_dist_dev    = -1;
-        FrameHeader *frm_hdr = &pcs->ppcs->frm_hdr;
+        pcs->zero_filt_sse             = -1;
+        pcs->best_filt_sse             = -1;
+        pcs->dlf_dist_dev              = -1;
+        FrameHeader   *frm_hdr         = &pcs->ppcs->frm_hdr;
         Bool           dlf_enable_flag = (Bool)pcs->ppcs->dlf_ctrls.enabled;
         const uint16_t tg_count        = pcs->ppcs->tile_group_cols * pcs->ppcs->tile_group_rows;
         // Move sb level lf to here if tile_parallel

@@ -971,13 +971,11 @@ static void unipred_3x3_candidates_injection(PictureControlSet *pcs, ModeDecisio
                 }
                 uint8_t to_inject_ref_type = svt_get_ref_frame_type(list_idx, ref_idx);
 
-
                 MvReferenceFrame rf[2];
                 rf[0]        = to_inject_ref_type;
                 rf[1]        = -1;
                 Mv to_inj_mv = {{to_inject_mv_x, to_inject_mv_y}};
-                if (
-                    (ctx->injected_mv_count == 0 ||
+                if ((ctx->injected_mv_count == 0 ||
                      mv_is_already_injected(ctx, to_inj_mv, to_inj_mv, to_inject_ref_type) == FALSE)) {
                     uint8_t drl_index = 0;
                     svt_aom_choose_best_av1_mv_pred(ctx,
@@ -992,8 +990,7 @@ static void unipred_3x3_candidates_injection(PictureControlSet *pcs, ModeDecisio
                                                     0,
                                                     &drl_index,
                                                     best_pred_mv);
-                    if (!ctx->corrupted_mv_check ||
-                        is_valid_mv_diff(best_pred_mv, to_inj_mv, to_inj_mv, 0)) {
+                    if (!ctx->corrupted_mv_check || is_valid_mv_diff(best_pred_mv, to_inj_mv, to_inj_mv, 0)) {
                         const uint8_t is_ii_allowed = svt_is_interintra_allowed(ctx->inter_intra_comp_ctrls.enabled,
                                                                                 ctx->blk_geom->bsize,
                                                                                 NEWMV,
@@ -1127,8 +1124,7 @@ static void bipred_3x3_candidates_injection(PictureControlSet *pcs, ModeDecision
 
                         Mv to_inj_mv0 = {{to_inject_mv_x_l0, to_inject_mv_y_l0}};
                         Mv to_inj_mv1 = {{to_inject_mv_x_l1, to_inject_mv_y_l1}};
-                        if (
-                            (ctx->injected_mv_count == 0 ||
+                        if ((ctx->injected_mv_count == 0 ||
                              mv_is_already_injected(ctx, to_inj_mv0, to_inj_mv1, to_inject_ref_type) == FALSE)) {
                             uint8_t drl_index = 0;
                             svt_aom_choose_best_av1_mv_pred(ctx,
@@ -1143,8 +1139,7 @@ static void bipred_3x3_candidates_injection(PictureControlSet *pcs, ModeDecision
                                                             to_inject_mv_y_l1,
                                                             &drl_index,
                                                             best_pred_mv);
-                            if (!ctx->corrupted_mv_check ||
-                                is_valid_mv_diff(best_pred_mv, to_inj_mv0, to_inj_mv1, 1)) {
+                            if (!ctx->corrupted_mv_check || is_valid_mv_diff(best_pred_mv, to_inj_mv0, to_inj_mv1, 1)) {
                                 ctx->cmp_store.pred0_cnt = 0;
                                 ctx->cmp_store.pred1_cnt = 0;
                                 Bool mask_done           = 0;
@@ -1225,8 +1220,7 @@ static void bipred_3x3_candidates_injection(PictureControlSet *pcs, ModeDecision
 
                         Mv to_inj_mv0 = {{to_inject_mv_x_l0, to_inject_mv_y_l0}};
                         Mv to_inj_mv1 = {{to_inject_mv_x_l1, to_inject_mv_y_l1}};
-                        if (
-                            (ctx->injected_mv_count == 0 ||
+                        if ((ctx->injected_mv_count == 0 ||
                              mv_is_already_injected(ctx, to_inj_mv0, to_inj_mv1, to_inject_ref_type) == FALSE)) {
                             uint8_t drl_index = 0;
                             svt_aom_choose_best_av1_mv_pred(ctx,
@@ -1241,8 +1235,7 @@ static void bipred_3x3_candidates_injection(PictureControlSet *pcs, ModeDecision
                                                             to_inject_mv_y_l1,
                                                             &drl_index,
                                                             best_pred_mv);
-                            if (!ctx->corrupted_mv_check ||
-                                is_valid_mv_diff(best_pred_mv, to_inj_mv0, to_inj_mv1, 1)) {
+                            if (!ctx->corrupted_mv_check || is_valid_mv_diff(best_pred_mv, to_inj_mv0, to_inj_mv1, 1)) {
                                 ctx->cmp_store.pred0_cnt = 0;
                                 ctx->cmp_store.pred1_cnt = 0;
                                 Bool mask_done           = 0;
@@ -1836,7 +1829,7 @@ static void inject_new_nearest_new_comb_candidates(PictureControlSet *pcs, ModeD
                 Mv      to_inj_mv1        = {{to_inject_mv_x_l1, to_inject_mv_y_l1}};
                 uint8_t inj_mv            = (ctx->injected_mv_count == 0 ||
                                   mv_is_already_injected(ctx, to_inj_mv0, to_inj_mv1, ref_pair) == FALSE);
-                inj_mv = inj_mv &&
+                inj_mv                    = inj_mv &&
                     svt_aom_is_me_data_present(
                              ctx->me_block_offset, ctx->me_cand_offset, me_results, get_list_idx(rf[1]), ref_idx_1);
                 if (inj_mv) {
@@ -1899,7 +1892,7 @@ static void inject_new_nearest_new_comb_candidates(PictureControlSet *pcs, ModeD
                 Mv      to_inj_mv1 = {{to_inject_mv_x_l1, to_inject_mv_y_l1}};
                 uint8_t inj_mv     = (ctx->injected_mv_count == 0 ||
                                   mv_is_already_injected(ctx, to_inj_mv0, to_inj_mv1, ref_pair) == FALSE);
-                inj_mv = inj_mv &&
+                inj_mv             = inj_mv &&
                     svt_aom_is_me_data_present(ctx->me_block_offset, ctx->me_cand_offset, me_results, 0, ref_idx_0);
                 if (inj_mv) {
                     ctx->cmp_store.pred0_cnt = 0;
@@ -2239,8 +2232,7 @@ uint8_t svt_aom_wm_motion_refinement(PictureControlSet *pcs, ModeDecisionContext
     cand->pred_mv[list_idx].y = best_pred_mv[0].as_mv.row;
 
     // Check that final chosen MV is valid
-    if (!ctx->corrupted_mv_check ||
-        is_valid_mv_diff(best_pred_mv, best_mv, best_mv, 0)) {
+    if (!ctx->corrupted_mv_check || is_valid_mv_diff(best_pred_mv, best_mv, best_mv, 0)) {
         return 1;
     }
 
@@ -2484,8 +2476,7 @@ uint8_t svt_aom_obmc_motion_refinement(PictureControlSet *pcs, struct ModeDecisi
     cand->pred_mv[ref_list_idx].x = best_pred_mv[0].as_mv.col;
     cand->pred_mv[ref_list_idx].y = best_pred_mv[0].as_mv.row;
     // Check that final chosen MV is valid
-    if (!ctx->corrupted_mv_check ||
-        is_valid_mv_diff(best_pred_mv, cand->mv[ref_list_idx], cand->mv[ref_list_idx], 0)) {
+    if (!ctx->corrupted_mv_check || is_valid_mv_diff(best_pred_mv, cand->mv[ref_list_idx], cand->mv[ref_list_idx], 0)) {
         return 1;
     }
 
@@ -2638,8 +2629,7 @@ static void inject_new_candidates_light_pd1(PictureControlSet *pcs, struct ModeD
                                                 0,
                                                 &drl_index,
                                                 best_pred_mv);
-                if (!ctx->corrupted_mv_check ||
-                    is_valid_mv_diff(best_pred_mv, to_inj_mv, to_inj_mv, 0)) {
+                if (!ctx->corrupted_mv_check || is_valid_mv_diff(best_pred_mv, to_inj_mv, to_inj_mv, 0)) {
                     cand_array[cand_total_cnt].skip_mode_allowed     = FALSE;
                     cand_array[cand_total_cnt].pred_mode             = NEWMV;
                     cand_array[cand_total_cnt].motion_mode           = SIMPLE_TRANSLATION;
@@ -2682,8 +2672,7 @@ static void inject_new_candidates_light_pd1(PictureControlSet *pcs, struct ModeD
                                                     0,
                                                     &drl_index,
                                                     best_pred_mv);
-                    if (!ctx->corrupted_mv_check ||
-                        is_valid_mv_diff(best_pred_mv, to_inj_mv, to_inj_mv, 0)) {
+                    if (!ctx->corrupted_mv_check || is_valid_mv_diff(best_pred_mv, to_inj_mv, to_inj_mv, 0)) {
                         cand_array[cand_total_cnt].skip_mode_allowed = FALSE;
                         cand_array[cand_total_cnt].pred_mode         = NEWMV;
                         cand_array[cand_total_cnt].motion_mode       = SIMPLE_TRANSLATION;
@@ -2733,8 +2722,7 @@ static void inject_new_candidates_light_pd1(PictureControlSet *pcs, struct ModeD
                                                     to_inject_mv_y_l1,
                                                     &drl_index,
                                                     best_pred_mv);
-                    if (!ctx->corrupted_mv_check ||
-                        is_valid_mv_diff(best_pred_mv, to_inj_mv0, to_inj_mv1, 1)) {
+                    if (!ctx->corrupted_mv_check || is_valid_mv_diff(best_pred_mv, to_inj_mv0, to_inj_mv1, 1)) {
                         cand_array[cand_total_cnt].skip_mode_allowed     = FALSE;
                         cand_array[cand_total_cnt].drl_index             = drl_index;
                         cand_array[cand_total_cnt].mv[REF_LIST_0].as_int = to_inj_mv0.as_int;
@@ -2773,8 +2761,8 @@ static void inject_new_candidates(PictureControlSet *pcs, ModeDecisionContext *c
     const MeSbResults     *me_results       = pcs->ppcs->pa_me_data->me_results[me_sb_addr];
     uint8_t                total_me_cnt     = me_results->total_me_candidate_index[me_block_offset];
     const MeCandidate     *me_block_results = &me_results->me_candidate_array[ctx->me_cand_offset];
-    BlockSize    bsize          = ctx->blk_geom->bsize; // bloc size
-    MD_COMP_TYPE tot_comp_types = get_tot_comp_types_bsize(
+    BlockSize              bsize            = ctx->blk_geom->bsize; // bloc size
+    MD_COMP_TYPE           tot_comp_types   = get_tot_comp_types_bsize(
         (ctx->inter_comp_ctrls.do_me == 0) ? MD_COMP_DIST : ctx->inter_comp_ctrls.tot_comp_types, ctx->blk_geom->bsize);
     for (uint8_t me_candidate_index = 0; me_candidate_index < total_me_cnt; ++me_candidate_index) {
         const MeCandidate *me_block_results_ptr = &me_block_results[me_candidate_index];
@@ -2797,9 +2785,8 @@ static void inject_new_candidates(PictureControlSet *pcs, ModeDecisionContext *c
             int16_t to_inject_mv_x     = ctx->sb_me_mv[list_idx][ref_idx][0];
             int16_t to_inject_mv_y     = ctx->sb_me_mv[list_idx][ref_idx][1];
             uint8_t to_inject_ref_type = svt_get_ref_frame_type(list_idx, ref_idx);
-            Mv to_inj_mv = {{to_inject_mv_x, to_inject_mv_y}};
-            if (
-                (ctx->injected_mv_count == 0 ||
+            Mv      to_inj_mv          = {{to_inject_mv_x, to_inject_mv_y}};
+            if ((ctx->injected_mv_count == 0 ||
                  mv_is_already_injected(ctx, to_inj_mv, to_inj_mv, to_inject_ref_type) == FALSE)) {
                 uint8_t drl_index = 0;
                 svt_aom_choose_best_av1_mv_pred(ctx,
@@ -2814,8 +2801,7 @@ static void inject_new_candidates(PictureControlSet *pcs, ModeDecisionContext *c
                                                 0,
                                                 &drl_index,
                                                 best_pred_mv);
-                if (!ctx->corrupted_mv_check ||
-                    is_valid_mv_diff(best_pred_mv, to_inj_mv, to_inj_mv, 0)) {
+                if (!ctx->corrupted_mv_check || is_valid_mv_diff(best_pred_mv, to_inj_mv, to_inj_mv, 0)) {
                     const uint8_t is_ii_allowed = svt_is_interintra_allowed(
                                                       ctx->inter_intra_comp_ctrls.enabled,
                                                       bsize,
@@ -2884,8 +2870,7 @@ static void inject_new_candidates(PictureControlSet *pcs, ModeDecisionContext *c
 
                     Mv to_inj_mv0 = {{to_inject_mv_x_l0, to_inject_mv_y_l0}};
                     Mv to_inj_mv1 = {{to_inject_mv_x_l1, to_inject_mv_y_l1}};
-                    if (
-                        (ctx->injected_mv_count == 0 ||
+                    if ((ctx->injected_mv_count == 0 ||
                          mv_is_already_injected(ctx, to_inj_mv0, to_inj_mv1, to_inject_ref_type) == FALSE)) {
                         uint8_t drl_index = 0;
                         svt_aom_choose_best_av1_mv_pred(ctx,
@@ -2900,8 +2885,7 @@ static void inject_new_candidates(PictureControlSet *pcs, ModeDecisionContext *c
                                                         to_inject_mv_y_l1,
                                                         &drl_index,
                                                         best_pred_mv);
-                        if (!ctx->corrupted_mv_check ||
-                            is_valid_mv_diff(best_pred_mv, to_inj_mv0, to_inj_mv1, 1)) {
+                        if (!ctx->corrupted_mv_check || is_valid_mv_diff(best_pred_mv, to_inj_mv0, to_inj_mv1, 1)) {
                             ctx->cmp_store.pred0_cnt = 0;
                             ctx->cmp_store.pred1_cnt = 0;
                             Bool mask_done           = 0;
@@ -2961,9 +2945,9 @@ static void inject_global_candidates(PictureControlSet *pcs, ModeDecisionContext
                                      Bool allow_bipred, uint32_t *candidate_total_cnt) {
     ModeDecisionCandidate *cand_array     = ctx->fast_cand_array;
     uint32_t               cand_total_cnt = (*candidate_total_cnt);
-    uint32_t  mi_row = ctx->blk_org_y >> MI_SIZE_LOG2;
-    uint32_t  mi_col = ctx->blk_org_x >> MI_SIZE_LOG2;
-    BlockSize bsize  = ctx->blk_geom->bsize; // bloc size
+    uint32_t               mi_row         = ctx->blk_org_y >> MI_SIZE_LOG2;
+    uint32_t               mi_col         = ctx->blk_org_x >> MI_SIZE_LOG2;
+    BlockSize              bsize          = ctx->blk_geom->bsize; // bloc size
 
     for (uint32_t ref_it = 0; ref_it < ctx->tot_ref_frame_types; ++ref_it) {
         MvReferenceFrame ref_pair = ctx->ref_frame_type_arr[ref_it];
@@ -2993,8 +2977,7 @@ static void inject_global_candidates(PictureControlSet *pcs, ModeDecisionContext
             int16_t to_inject_mv_x = mv.as_mv.col;
             int16_t to_inject_mv_y = mv.as_mv.row;
 
-            if (
-                (((gm_params->wmtype > TRANSLATION && ctx->blk_geom->bwidth >= 8 && ctx->blk_geom->bheight >= 8) ||
+            if ((((gm_params->wmtype > TRANSLATION && ctx->blk_geom->bwidth >= 8 && ctx->blk_geom->bheight >= 8) ||
                   gm_params->wmtype <= TRANSLATION))) {
                 const uint8_t is_ii_allowed = svt_is_interintra_allowed(
                                                   ctx->inter_intra_comp_ctrls.enabled, bsize, GLOBALMV, rf) &&
@@ -3146,8 +3129,7 @@ static void inject_pme_candidates(PictureControlSet *pcs, ModeDecisionContext *c
                                                     0,
                                                     &drl_index,
                                                     best_pred_mv);
-                    if (!ctx->corrupted_mv_check ||
-                        is_valid_mv_diff(best_pred_mv, to_inj_mv, to_inj_mv, 0)) {
+                    if (!ctx->corrupted_mv_check || is_valid_mv_diff(best_pred_mv, to_inj_mv, to_inj_mv, 0)) {
                         const uint8_t is_ii_allowed = svt_is_interintra_allowed(
                                                           ctx->inter_intra_comp_ctrls.enabled, bsize, NEWMV, rf) &&
                             svt_aom_is_valid_unipred_ref(ctx, INTER_INTRA_GROUP, list_idx, ref_idx);
@@ -3202,71 +3184,70 @@ static void inject_pme_candidates(PictureControlSet *pcs, ModeDecisionContext *c
                 int16_t to_inject_mv_x_l1 = ctx->best_pme_mv[list_idx_1][ref_idx_1][0];
                 int16_t to_inject_mv_y_l1 = ctx->best_pme_mv[list_idx_1][ref_idx_1][1];
 
-                    uint8_t to_inject_ref_type = av1_ref_frame_type((const MvReferenceFrame[]){
-                        svt_get_ref_frame_type(list_idx_0, ref_idx_0),
-                        svt_get_ref_frame_type(list_idx_1, ref_idx_1),
-                    });
-                    Mv      to_inj_mv0         = {{to_inject_mv_x_l0, to_inject_mv_y_l0}};
-                    Mv      to_inj_mv1         = {{to_inject_mv_x_l1, to_inject_mv_y_l1}};
-                    if ((ctx->injected_mv_count == 0 ||
-                         mv_is_already_injected(ctx, to_inj_mv0, to_inj_mv1, to_inject_ref_type) == FALSE)) {
-                        uint8_t drl_index = 0;
-                        svt_aom_choose_best_av1_mv_pred(ctx,
-                                                        ctx->md_rate_est_ctx,
-                                                        ctx->blk_ptr,
-                                                        to_inject_ref_type,
-                                                        1,
-                                                        NEW_NEWMV,
-                                                        to_inject_mv_x_l0,
-                                                        to_inject_mv_y_l0,
-                                                        to_inject_mv_x_l1,
-                                                        to_inject_mv_y_l1,
-                                                        &drl_index,
-                                                        best_pred_mv);
-                        if (!ctx->corrupted_mv_check ||
-                            is_valid_mv_diff(best_pred_mv, to_inj_mv0, to_inj_mv1, 1)) {
-                            ctx->cmp_store.pred0_cnt = 0;
-                            ctx->cmp_store.pred1_cnt = 0;
-                            Bool mask_done           = 0;
-                            for (MD_COMP_TYPE cur_type = MD_COMP_AVG; cur_type < tot_comp_types; cur_type++) {
-                                if (ctx->inter_comp_ctrls.no_sym_dist && cur_type == MD_COMP_DIST && ref_idx_0 == 0 &&
-                                    ref_idx_1 == 0)
-                                    continue;
+                uint8_t to_inject_ref_type = av1_ref_frame_type((const MvReferenceFrame[]){
+                    svt_get_ref_frame_type(list_idx_0, ref_idx_0),
+                    svt_get_ref_frame_type(list_idx_1, ref_idx_1),
+                });
+                Mv      to_inj_mv0         = {{to_inject_mv_x_l0, to_inject_mv_y_l0}};
+                Mv      to_inj_mv1         = {{to_inject_mv_x_l1, to_inject_mv_y_l1}};
+                if ((ctx->injected_mv_count == 0 ||
+                     mv_is_already_injected(ctx, to_inj_mv0, to_inj_mv1, to_inject_ref_type) == FALSE)) {
+                    uint8_t drl_index = 0;
+                    svt_aom_choose_best_av1_mv_pred(ctx,
+                                                    ctx->md_rate_est_ctx,
+                                                    ctx->blk_ptr,
+                                                    to_inject_ref_type,
+                                                    1,
+                                                    NEW_NEWMV,
+                                                    to_inject_mv_x_l0,
+                                                    to_inject_mv_y_l0,
+                                                    to_inject_mv_x_l1,
+                                                    to_inject_mv_y_l1,
+                                                    &drl_index,
+                                                    best_pred_mv);
+                    if (!ctx->corrupted_mv_check || is_valid_mv_diff(best_pred_mv, to_inj_mv0, to_inj_mv1, 1)) {
+                        ctx->cmp_store.pred0_cnt = 0;
+                        ctx->cmp_store.pred1_cnt = 0;
+                        Bool mask_done           = 0;
+                        for (MD_COMP_TYPE cur_type = MD_COMP_AVG; cur_type < tot_comp_types; cur_type++) {
+                            if (ctx->inter_comp_ctrls.no_sym_dist && cur_type == MD_COMP_DIST && ref_idx_0 == 0 &&
+                                ref_idx_1 == 0)
+                                continue;
 
-                                if (!is_valid_bi_type(ctx, cur_type, list_idx_0, ref_idx_0, list_idx_1, ref_idx_1))
-                                    continue;
-                                cand_array[cand_total_cnt].use_intrabc       = 0;
-                                cand_array[cand_total_cnt].skip_mode_allowed = FALSE;
-                                cand_array[cand_total_cnt].drl_index         = drl_index;
-                                // Set the MV to ME result
-                                cand_array[cand_total_cnt].mv[REF_LIST_0].as_int = to_inj_mv0.as_int;
-                                cand_array[cand_total_cnt].mv[REF_LIST_1].as_int = to_inj_mv1.as_int;
-                                // will be needed later by the rate estimation
-                                cand_array[cand_total_cnt].pred_mode           = NEW_NEWMV;
-                                cand_array[cand_total_cnt].motion_mode         = SIMPLE_TRANSLATION;
-                                cand_array[cand_total_cnt].is_interintra_used  = 0;
-                                cand_array[cand_total_cnt].ref_frame_type      = to_inject_ref_type;
-                                cand_array[cand_total_cnt].pred_mv[REF_LIST_0] = (Mv){
-                                    {best_pred_mv[0].as_mv.col, best_pred_mv[0].as_mv.row}};
-                                cand_array[cand_total_cnt].pred_mv[REF_LIST_1] = (Mv){
-                                    {best_pred_mv[1].as_mv.col, best_pred_mv[1].as_mv.row}};
-                                //MVP REFINE
-                                if (cur_type > MD_COMP_AVG) {
-                                    if (mask_done != 1) {
-                                        if (svt_aom_calc_pred_masked_compound(pcs, ctx, &cand_array[cand_total_cnt]))
-                                            break;
-                                        mask_done = 1;
-                                    }
+                            if (!is_valid_bi_type(ctx, cur_type, list_idx_0, ref_idx_0, list_idx_1, ref_idx_1))
+                                continue;
+                            cand_array[cand_total_cnt].use_intrabc       = 0;
+                            cand_array[cand_total_cnt].skip_mode_allowed = FALSE;
+                            cand_array[cand_total_cnt].drl_index         = drl_index;
+                            // Set the MV to ME result
+                            cand_array[cand_total_cnt].mv[REF_LIST_0].as_int = to_inj_mv0.as_int;
+                            cand_array[cand_total_cnt].mv[REF_LIST_1].as_int = to_inj_mv1.as_int;
+                            // will be needed later by the rate estimation
+                            cand_array[cand_total_cnt].pred_mode           = NEW_NEWMV;
+                            cand_array[cand_total_cnt].motion_mode         = SIMPLE_TRANSLATION;
+                            cand_array[cand_total_cnt].is_interintra_used  = 0;
+                            cand_array[cand_total_cnt].ref_frame_type      = to_inject_ref_type;
+                            cand_array[cand_total_cnt].pred_mv[REF_LIST_0] = (Mv){
+                                {best_pred_mv[0].as_mv.col, best_pred_mv[0].as_mv.row}};
+                            cand_array[cand_total_cnt].pred_mv[REF_LIST_1] = (Mv){
+                                {best_pred_mv[1].as_mv.col, best_pred_mv[1].as_mv.row}};
+                            //MVP REFINE
+                            if (cur_type > MD_COMP_AVG) {
+                                if (mask_done != 1) {
+                                    if (svt_aom_calc_pred_masked_compound(pcs, ctx, &cand_array[cand_total_cnt]))
+                                        break;
+                                    mask_done = 1;
                                 }
-                                determine_compound_mode(pcs, ctx, &cand_array[cand_total_cnt], cur_type);
-                                INC_MD_CAND_CNT(cand_total_cnt, pcs->ppcs->max_can_count);
                             }
-                            ctx->injected_mvs[ctx->injected_mv_count][0].as_int = to_inj_mv0.as_int;
-                            ctx->injected_mvs[ctx->injected_mv_count][1].as_int = to_inj_mv1.as_int;
-                            ctx->injected_ref_types[ctx->injected_mv_count]     = to_inject_ref_type;
-                            ++ctx->injected_mv_count;
+                            determine_compound_mode(pcs, ctx, &cand_array[cand_total_cnt], cur_type);
+                            INC_MD_CAND_CNT(cand_total_cnt, pcs->ppcs->max_can_count);
                         }
+                        ctx->injected_mvs[ctx->injected_mv_count][0].as_int = to_inj_mv0.as_int;
+                        ctx->injected_mvs[ctx->injected_mv_count][1].as_int = to_inj_mv1.as_int;
+                        ctx->injected_ref_types[ctx->injected_mv_count]     = to_inject_ref_type;
+                        ++ctx->injected_mv_count;
                     }
+                }
             }
         }
     }

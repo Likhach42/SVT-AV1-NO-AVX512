@@ -932,7 +932,7 @@ EB_API void svt_av1_print_version(void);
      * @ *config_ptr     Pointer passed back to the client during callbacks, it will be
      *                  loaded with default params from the library. */
 EB_API EbErrorType svt_av1_enc_init_handle(
-    EbComponentType **p_handle,
+    EbComponentType         **p_handle,
     EbSvtAv1EncConfiguration *config_ptr); // config_ptr will be loaded with default params from the library
 
 /* STEP 2: Set all configuration parameters.

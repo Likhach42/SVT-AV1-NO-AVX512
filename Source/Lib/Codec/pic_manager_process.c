@@ -425,7 +425,9 @@ void *svt_aom_picture_manager_kernel(void *input_ptr) {
             }
             break;
 
-        case EB_PIC_REFERENCE: scs = input_pic_demux->scs; enc_ctx = scs->enc_ctx;
+        case EB_PIC_REFERENCE:
+            scs     = input_pic_demux->scs;
+            enc_ctx = scs->enc_ctx;
             // Find the Reference in the Reference List
 #if OPT_LD_LATENCY2
             svt_block_on_mutex(enc_ctx->ref_pic_list_mutex);

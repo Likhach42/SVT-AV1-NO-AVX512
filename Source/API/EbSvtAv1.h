@@ -102,9 +102,9 @@ typedef struct EbBufferHeaderType {
     int64_t  pts;
 
     // pic info
-    uint8_t temporal_layer_index;
-    uint32_t qp;
-    uint32_t avg_qp;
+    uint8_t          temporal_layer_index;
+    uint32_t         qp;
+    uint32_t         avg_qp;
     EbAv1PictureType pic_type;
     uint64_t         luma_sse;
     uint64_t         cr_sse;

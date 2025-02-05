@@ -727,7 +727,7 @@ void init_reader(EbConfig *app_cfg) {
 ***************************************/
 void process_output_statistics_buffer(EbBufferHeaderType *header_ptr, EbConfig *app_cfg) {
     uint32_t max_luma_value = (app_cfg->config.encoder_bit_depth == 8) ? 255 : 1023;
-    uint8_t temporal_layer_index;
+    uint8_t  temporal_layer_index;
     uint32_t avg_qp;
     uint64_t picture_stream_size, luma_sse, cr_sse, cb_sse, picture_number, picture_qp;
     double   luma_ssim, cr_ssim, cb_ssim;
@@ -735,17 +735,17 @@ void process_output_statistics_buffer(EbBufferHeaderType *header_ptr, EbConfig *
     uint32_t source_width  = app_cfg->config.source_width;
     uint32_t source_height = app_cfg->config.source_height;
 
-    picture_stream_size = header_ptr->n_filled_len;
-    luma_sse            = header_ptr->luma_sse;
-    cr_sse              = header_ptr->cr_sse;
-    cb_sse              = header_ptr->cb_sse;
-    picture_number      = header_ptr->pts;
+    picture_stream_size  = header_ptr->n_filled_len;
+    luma_sse             = header_ptr->luma_sse;
+    cr_sse               = header_ptr->cr_sse;
+    cb_sse               = header_ptr->cb_sse;
+    picture_number       = header_ptr->pts;
     temporal_layer_index = header_ptr->temporal_layer_index;
-    picture_qp = header_ptr->qp;
-    avg_qp = header_ptr->avg_qp;
-    luma_ssim = header_ptr->luma_ssim;
-    cr_ssim   = header_ptr->cr_ssim;
-    cb_ssim   = header_ptr->cb_ssim;
+    picture_qp           = header_ptr->qp;
+    avg_qp               = header_ptr->avg_qp;
+    luma_ssim            = header_ptr->luma_ssim;
+    cr_ssim              = header_ptr->cr_ssim;
+    cb_ssim              = header_ptr->cb_ssim;
 
     temp_var = (double)max_luma_value * max_luma_value * (source_width * source_height);
 

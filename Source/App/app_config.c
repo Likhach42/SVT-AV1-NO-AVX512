@@ -1122,7 +1122,7 @@ ConfigEntry config_entry_specific[] = {
      RESIZE_FRAME_DENOMS,
      "Resize denominator in event, in a list separated by ',', only applicable for mode == 4",
      set_cfg_generic_token},
-// --- end: REFERENCE SCALING SUPPORT
+    // --- end: REFERENCE SCALING SUPPORT
     {SINGLE_INPUT, LOSSLESS_TOKEN, "Enable lossless coding, default is 0 [0-1]", set_cfg_generic_token},
     {SINGLE_INPUT, AVIF_TOKEN, "Enable still-picture coding, default is 0 [0-1]", set_cfg_generic_token},
     // Termination
@@ -1226,7 +1226,7 @@ ConfigEntry config_entry[] = {
     //   Asm Type
     {SINGLE_INPUT, ASM_TYPE_TOKEN, "Asm", set_cfg_generic_token},
 
-//   Thread Management
+    //   Thread Management
     {SINGLE_INPUT, THREAD_MGMNT, "LevelOfParallelism", set_cfg_generic_token},
     {SINGLE_INPUT, PIN_TOKEN, "PinnedExecution", set_cfg_generic_token},
     {SINGLE_INPUT, TARGET_SOCKET, "TargetSocket", set_cfg_generic_token},

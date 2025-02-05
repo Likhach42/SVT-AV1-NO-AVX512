@@ -904,7 +904,7 @@ EbErrorType svt_av1_set_default_params(EbSvtAv1EncConfiguration *config_ptr) {
     config_ptr->starting_buffer_level_ms = 600; // default settings for CBR
     config_ptr->optimal_buffer_level_ms  = 600; // default settings for CBR
     config_ptr->recode_loop              = ALLOW_RECODE_DEFAULT;
-    config_ptr->screen_content_mode = 2;
+    config_ptr->screen_content_mode      = 2;
 
     // Annex A parameters
     config_ptr->profile = 0;
@@ -945,12 +945,12 @@ EbErrorType svt_av1_set_default_params(EbSvtAv1EncConfiguration *config_ptr) {
     config_ptr->resize_kf_denom = SCALE_NUMERATOR;
 
     // Color description default values
-    config_ptr->color_primaries                = 2;
-    config_ptr->transfer_characteristics       = 2;
-    config_ptr->matrix_coefficients            = 2;
-    config_ptr->color_range                    = EB_CR_STUDIO_RANGE;
-    config_ptr->chroma_sample_position         = EB_CSP_UNKNOWN;
-    config_ptr->pass                           = 0;
+    config_ptr->color_primaries          = 2;
+    config_ptr->transfer_characteristics = 2;
+    config_ptr->matrix_coefficients      = 2;
+    config_ptr->color_range              = EB_CR_STUDIO_RANGE;
+    config_ptr->chroma_sample_position   = EB_CSP_UNKNOWN;
+    config_ptr->pass                     = 0;
     memset(&config_ptr->mastering_display, 0, sizeof(config_ptr->mastering_display));
     memset(&config_ptr->content_light_level, 0, sizeof(config_ptr->content_light_level));
 
@@ -964,8 +964,8 @@ EbErrorType svt_av1_set_default_params(EbSvtAv1EncConfiguration *config_ptr) {
     config_ptr->min_qm_level = 8;
     config_ptr->max_qm_level = 15;
 
-    config_ptr->startup_mg_size = 0;
-    config_ptr->startup_qp_offset = 0;
+    config_ptr->startup_mg_size                   = 0;
+    config_ptr->startup_qp_offset                 = 0;
     config_ptr->frame_scale_evts.evt_num          = 0;
     config_ptr->frame_scale_evts.resize_denoms    = NULL;
     config_ptr->frame_scale_evts.resize_kf_denoms = NULL;
@@ -2021,7 +2021,7 @@ EB_API EbErrorType svt_av1_enc_parse_parameter(EbSvtAv1EncConfiguration *config_
     // Bool fields
     const struct {
         const char *name;
-        bool *out;
+        bool       *out;
     } bool_opts[] = {
         {"use-q-file", &config_struct->use_qp_file},
         {"enable-dlf", &config_struct->enable_dlf_flag},
