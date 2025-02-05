@@ -19,7 +19,6 @@
 
 #include "global_motion.h"
 
-#if CLN_RANSAC
 #define MIN_INLIER_PROB 0.1
 
 static const double kIdentityParams[MAX_PARAMDIM] = {
@@ -67,9 +66,4 @@ typedef struct {
 bool svt_aom_ransac(const Correspondence* matched_points, int npoints,
     TransformationType type, MotionModel* motion_models,
     int num_desired_motions, bool* mem_alloc_failed);
-#else
-typedef int (*RansacFunc)(int *matched_points, int npoints, int *num_inliers_by_motion, MotionModel *params_by_motion,
-                          int num_motions);
-RansacFunc svt_av1_get_ransac_type(TransformationType type);
-#endif
 #endif // AOM_AV1_ENCODER_RANSAC_H_

@@ -83,11 +83,7 @@ enum {
     PROP_MAXIMUM_BUFFER_SIZE,
     PROP_INTRA_PERIOD_LENGTH,
     PROP_INTRA_REFRESH_TYPE,
-#if FIX_SVT_AV1_CHECK_VERSION
     PROP_LEVEL_OF_PARALLELISM,
-#else
-    PROP_LOGICAL_PROCESSORS,
-#endif
     PROP_TARGET_SOCKET,
     PROP_PARAMETERS_STRING,
 };
@@ -102,11 +98,7 @@ enum {
 #define PROP_MAXIMUM_BUFFER_SIZE_DEFAULT 1000
 #define PROP_INTRA_PERIOD_LENGTH_DEFAULT -2
 #define PROP_INTRA_REFRESH_TYPE_DEFAULT SVT_AV1_KF_REFRESH
-#if FIX_SVT_AV1_CHECK_VERSION
 #define PROP_LEVEL_OF_PARALLELISM_DEFAULT 0
-#else
-#define PROP_LOGICAL_PROCESSORS_DEFAULT 0
-#endif
 #define PROP_TARGET_SOCKET_DEFAULT -1
 #define PROP_PARAMETERS_STRING_DEFAULT NULL
 
@@ -285,7 +277,6 @@ static void gst_svtav1enc_class_init(GstSvtAv1EncClass *klass) {
                                                       GST_SVTAV1ENC_TYPE_INTRA_REFRESH_TYPE,
                                                       PROP_INTRA_REFRESH_TYPE_DEFAULT,
                                                       G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-#if FIX_SVT_AV1_CHECK_VERSION
     g_object_class_install_property(gobject_class,
                                     PROP_LEVEL_OF_PARALLELISM,
                                     g_param_spec_uint("logical-processors",
@@ -295,17 +286,6 @@ static void gst_svtav1enc_class_init(GstSvtAv1EncClass *klass) {
                                                       G_MAXUINT,
                                                       PROP_LEVEL_OF_PARALLELISM_DEFAULT,
                                                       G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-#else
-    g_object_class_install_property(gobject_class,
-                                    PROP_LOGICAL_PROCESSORS,
-                                    g_param_spec_uint("logical-processors",
-                                                      "Logical Processors",
-                                                      "Number of logical CPU cores to be used. 0: auto",
-                                                      0,
-                                                      G_MAXUINT,
-                                                      PROP_LOGICAL_PROCESSORS_DEFAULT,
-                                                      G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-#endif
 
     g_object_class_install_property(gobject_class,
                                     PROP_TARGET_SOCKET,
@@ -339,11 +319,7 @@ static void gst_svtav1enc_init(GstSvtAv1Enc *svtav1enc) {
     svtav1enc->maximum_buffer_size = PROP_MAXIMUM_BUFFER_SIZE_DEFAULT;
     svtav1enc->intra_period_length = PROP_INTRA_PERIOD_LENGTH_DEFAULT;
     svtav1enc->intra_refresh_type  = PROP_INTRA_REFRESH_TYPE_DEFAULT;
-#if FIX_SVT_AV1_CHECK_VERSION
     svtav1enc->level_of_parallelism = PROP_LEVEL_OF_PARALLELISM_DEFAULT;
-#else
-    svtav1enc->logical_processors = PROP_LOGICAL_PROCESSORS_DEFAULT;
-#endif
     svtav1enc->target_socket     = PROP_TARGET_SOCKET_DEFAULT;
     svtav1enc->parameters_string = PROP_PARAMETERS_STRING_DEFAULT;
 }
@@ -371,11 +347,7 @@ static void gst_svtav1enc_set_property(GObject *object, guint property_id, const
     case PROP_MAXIMUM_BUFFER_SIZE: svtav1enc->maximum_buffer_size = g_value_get_uint(value); break;
     case PROP_INTRA_PERIOD_LENGTH: svtav1enc->intra_period_length = g_value_get_int(value); break;
     case PROP_INTRA_REFRESH_TYPE: svtav1enc->intra_refresh_type = g_value_get_enum(value); break;
-#if FIX_SVT_AV1_CHECK_VERSION
     case PROP_LEVEL_OF_PARALLELISM: svtav1enc->level_of_parallelism = g_value_get_uint(value); break;
-#else
-    case PROP_LOGICAL_PROCESSORS: svtav1enc->logical_processors = g_value_get_uint(value); break;
-#endif
     case PROP_TARGET_SOCKET: svtav1enc->target_socket = g_value_get_int(value); break;
     case PROP_PARAMETERS_STRING: {
         g_free(svtav1enc->parameters_string);
@@ -403,11 +375,7 @@ static void gst_svtav1enc_get_property(GObject *object, guint property_id, GValu
     case PROP_MAXIMUM_BUFFER_SIZE: g_value_set_uint(value, svtav1enc->maximum_buffer_size); break;
     case PROP_INTRA_PERIOD_LENGTH: g_value_set_int(value, svtav1enc->intra_period_length); break;
     case PROP_INTRA_REFRESH_TYPE: g_value_set_enum(value, svtav1enc->intra_refresh_type); break;
-#if FIX_SVT_AV1_CHECK_VERSION
     case PROP_LEVEL_OF_PARALLELISM: g_value_set_uint(value, svtav1enc->level_of_parallelism); break;
-#else
-    case PROP_LOGICAL_PROCESSORS: g_value_set_uint(value, svtav1enc->logical_processors); break;
-#endif
     case PROP_TARGET_SOCKET: g_value_set_int(value, svtav1enc->target_socket); break;
     case PROP_PARAMETERS_STRING: g_value_set_string(value, svtav1enc->parameters_string); break;
     default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, pspec); break;
@@ -489,11 +457,7 @@ static gboolean gst_svtav1enc_configure_svt(GstSvtAv1Enc *svtav1enc) {
     }
     svtav1enc->svt_config->intra_period_length = svtav1enc->intra_period_length;
     svtav1enc->svt_config->intra_refresh_type  = svtav1enc->intra_refresh_type;
-#if FIX_SVT_AV1_CHECK_VERSION
     svtav1enc->svt_config->level_of_parallelism = svtav1enc->level_of_parallelism;
-#else
-    svtav1enc->svt_config->logical_processors = svtav1enc->logical_processors;
-#endif
     svtav1enc->svt_config->target_socket = svtav1enc->target_socket;
     gst_svtav1enc_parse_parameters_string(svtav1enc);
 
@@ -834,11 +798,7 @@ static gboolean gst_svtav1enc_open(GstVideoEncoder *encoder) {
     GstSvtAv1Enc *svtav1enc = GST_SVTAV1ENC(encoder);
 
     GST_DEBUG_OBJECT(svtav1enc, "open");
-#if FIX_P_APP_DATA
     EbErrorType res = svt_av1_enc_init_handle(&svtav1enc->svt_encoder, svtav1enc->svt_config);
-#else
-    EbErrorType res = svt_av1_enc_init_handle(&svtav1enc->svt_encoder, NULL, svtav1enc->svt_config);
-#endif
     if (res != EB_ErrorNone) {
         GST_ELEMENT_ERROR(svtav1enc, LIBRARY, INIT, (NULL), ("svt_av1_enc_init_handle failed with error %d", res));
         return FALSE;

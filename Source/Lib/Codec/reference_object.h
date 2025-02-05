@@ -21,14 +21,6 @@
 typedef struct EbReferenceObject {
     EbDctor                     dctor;
     EbPictureBufferDesc        *reference_picture;
-#if !CLN_UNUSED_GM_SIGS
-    EbPictureBufferDesc        *quarter_reference_picture;
-    EbPictureBufferDesc        *sixteenth_reference_picture;
-    EbDownScaledBufDescPtrArray ds_pics; // Pointer array for down scaled pictures
-    EbPictureBufferDesc        *input_picture;
-    EbPictureBufferDesc        *quarter_input_picture;
-    EbPictureBufferDesc        *sixteenth_input_picture;
-#endif
     EbPictureBufferDesc        *downscaled_reference_picture[NUM_SR_SCALES + 1][NUM_RESIZE_SCALES + 1];
     uint64_t                    downscaled_picture_number[NUM_SR_SCALES + 1]
                                       [NUM_RESIZE_SCALES + 1]; // save the picture_number for each denom
@@ -39,9 +31,7 @@ typedef struct EbReferenceObject {
     uint8_t              intra_coded_area; //percentage of intra coded area 0-100%
     uint8_t              skip_coded_area;
     uint8_t              hp_coded_area;
-#if OPT_MFMV
     uint8_t is_mfmv_used;
-#endif
     uint8_t              tmp_layer_idx;
     Bool                 is_scene_change;
     uint16_t             pic_avg_variance;
@@ -57,12 +47,8 @@ typedef struct EbReferenceObject {
     int32_t              filter_level[2];
     int32_t              filter_level_u;
     int32_t              filter_level_v;
-#if OPT_FRAME_DLF
     int32_t dlf_dist_dev;
-#endif
-#if OPT_CDEF_ME_INFO
     int32_t cdef_dist_dev;
-#endif
     uint32_t             ref_cdef_strengths_num;
     uint8_t              ref_cdef_strengths[2][TOTAL_STRENGTHS];
     uint8_t             *sb_intra;
