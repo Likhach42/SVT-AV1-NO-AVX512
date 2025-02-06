@@ -281,6 +281,7 @@ SvtAv1EncApp -i in.y4m -b out.ivf --roi-map-file roi_map.txt
 | **ResizeFrameKfDenoms**          | --frame-resz-kf-denoms | [8-16]         | 8           | Frame scale denominator for key frames in event, in a list separated by ',', only applicable for mode == 4                                                            |
 | **ResizeFrameDenoms**            | --frame-resz-denoms    | [8-16]         | 8           | Frame scale denominator in event, in a list separated by ',', only applicable for mode == 4                                                                           |
 | **Avif**                         | --avif                 | [0-1]          | 0           | Enable still-picture coding optimizations for improved coding efficiency and reduced memory usage                                                                     |
+| **NoiseNormStrength**            | --noise-norm-strength  | [0-4]          | 0           | Selectively boost an AC coefficients to improve fine detail retention in flatter blocks                                                                               |
 
 
 #### **Super-Resolution**
