@@ -1381,7 +1381,9 @@ static int av1_get_deltaq_sb_variance_boost(uint8_t base_q_idx, uint16_t *varian
     // Weigh the three variances in a 1:2:1 ratio, with rounding (the +2 term).
     // This allows for smoother delta-q transitions among superblocks with
     // mixed-variance features.
-    uint16_t variance = (ordered_variances[low_idx] + (ordered_variances[mid_idx] * 2) + ordered_variances[upp_idx] + 2) / 4;
+    uint16_t variance = (ordered_variances[low_idx] + (ordered_variances[mid_idx] * 2) + ordered_variances[upp_idx] +
+                         2) /
+        4;
 
 #if DEBUG_VAR_BOOST
     SVT_INFO("64x64 variance: %d\n", variances[ME_TIER_ZERO_PU_64x64]);
