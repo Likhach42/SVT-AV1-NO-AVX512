@@ -167,7 +167,7 @@ Edge Variance Mask (Hev\_Mask), Flat\_Mask, Flat\_Mask2
 
         - $`ABS(p_{i} - p_{i-1}) > limit, i=1,…,n`$; OR
 
-        - $`ABS(q_{i} – q_{i-1}) > limit, i=1,…,n`$; OR
+        - $`ABS(q_{i} - q_{i-1}) > limit, i=1,…,n`$; OR
 
         - $`ABS(p_{0} - q_{0}) * 2 + ABS(p_{1} - q_{1}) / 2 > blimit`$.
 
