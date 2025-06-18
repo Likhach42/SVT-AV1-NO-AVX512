@@ -87,13 +87,13 @@ void svt_ext_sad_calculation_32x32_64x64_sse4_intrin(uint32_t *p_sad16x16, uint3
     }
 }
 
-uint32_t svt_sad_nxm_combined_sse4_1(const uint8_t *src, uint32_t src_stride, const uint8_t *ref,
-                                     uint32_t ref_stride, int32_t height, int32_t width) {
+uint32_t svt_sad_nxm_combined_sse4_1(const uint8_t *src, uint32_t src_stride, const uint8_t *ref, uint32_t ref_stride,
+                                     int32_t height, int32_t width) {
     // these must match block widths implemented in svt_nxm_sad_kernel_helper_sse4_1
     // 1, 2, 3 are added for convenience and will be handled by C code
-    static const int available_widths[] = {1,2,3,4,8,16,24,32,40,48,56,64};
-    int i = sizeof(available_widths) / sizeof(available_widths[0]);
-    uint32_t sad = 0;
+    static const int available_widths[] = {1, 2, 3, 4, 8, 16, 24, 32, 40, 48, 56, 64};
+    int              i                  = sizeof(available_widths) / sizeof(available_widths[0]);
+    uint32_t         sad                = 0;
     while (width > 0) {
         while (--i >= 0) {
             int w = available_widths[i];
@@ -118,8 +118,8 @@ void svt_sad_loop_kernel_anyxh_sse4_1(uint8_t  *src, // input parameter, source 
                                       uint64_t *best_sad, int16_t *x_search_center, int16_t *y_search_center,
                                       uint32_t src_stride_raw, // input parameter, source stride (no line skipping)
                                       uint8_t skip_search_line, int16_t search_area_width, int16_t search_area_height) {
-    int16_t x_search_index;
-    int16_t y_search_index;
+    int16_t   x_search_index;
+    int16_t   y_search_index;
     const int skip_line_value = (block_width == 16 && block_height <= 16 && skip_search_line) ? 0 : -1;
 
     for (y_search_index = 0; y_search_index < search_area_height; y_search_index++) {
@@ -128,8 +128,8 @@ void svt_sad_loop_kernel_anyxh_sse4_1(uint8_t  *src, // input parameter, source 
             continue;
         }
         for (x_search_index = 0; x_search_index < search_area_width; x_search_index++) {
-            uint32_t sad = svt_sad_nxm_combined_sse4_1(src, src_stride, ref + x_search_index,
-                                                       ref_stride, block_height, block_width);
+            uint32_t sad = svt_sad_nxm_combined_sse4_1(
+                src, src_stride, ref + x_search_index, ref_stride, block_height, block_width);
 
             // Update results
             if (sad < *best_sad) {
