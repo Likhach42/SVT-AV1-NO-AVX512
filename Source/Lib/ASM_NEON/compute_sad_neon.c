@@ -931,7 +931,12 @@ uint32_t svt_sad_nxm_combined_neon(const uint8_t *src, uint32_t src_stride, cons
         while (--i >= 0) {
             int w = available_widths[i];
             if (w <= width) {
-                sad += svt_nxm_sad_kernel_helper_neon(src, src_stride, ref, ref_stride, height, w);
+                if (w == 4 && (height & 1)) {
+                    // sad4xh_neon only handles even heights
+                    sad += svt_fast_loop_nxm_sad_kernel(src, src_stride, ref, ref_stride, height, w);
+                } else {
+                    sad += svt_nxm_sad_kernel_helper_neon(src, src_stride, ref, ref_stride, height, w);
+                }
                 width -= w;
                 src += w;
                 ref += w;
