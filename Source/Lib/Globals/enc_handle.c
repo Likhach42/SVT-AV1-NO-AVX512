@@ -2661,7 +2661,10 @@ EB_API EbErrorType svt_av1_enc_init_handle(
 {
     if(p_handle == NULL)
          return EB_ErrorBadParameter;
+
+#if !CONFIG_LOG_QUIET
     svt_log_init();
+#endif
 
     #if defined(__linux__)
         if(lp_group == NULL) {

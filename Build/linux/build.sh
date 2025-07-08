@@ -109,6 +109,10 @@ For each enable-*, there is a disable-* option, and vice versa.
 -v, --verbose, verbose  Print out commands
     --minimal-build,    Enable minimal build
     minimal-build
+    --rtc-build,        Do RTC build, ie reduced feature set
+    rtc-build
+    --log-quiet,        Do not log anything from the core encoder
+    log-quiet
 
 Example usage:
     build.sh -xi debug test
@@ -346,6 +350,8 @@ parse_options() {
             ;;
         verbose) CMAKE_EXTRA_FLAGS="$CMAKE_EXTRA_FLAGS -DCMAKE_VERBOSE_MAKEFILE=1" && shift ;;
         minimal-build) CMAKE_EXTRA_FLAGS="$CMAKE_EXTRA_FLAGS -DMINIMAL_BUILD=ON" && shift ;;
+        rtc-build) CMAKE_EXTRA_FLAGS="$CMAKE_EXTRA_FLAGS -DRTC_BUILD=ON" && shift ;;
+        log-quiet) CMAKE_EXTRA_FLAGS="$CMAKE_EXTRA_FLAGS -DLOG_QUIET=ON" && shift ;;
         *) print_message "Unknown option: $1" && shift ;;
         esac
     done
@@ -389,6 +395,8 @@ else
             test) parse_options tests && shift ;;
             verbose) parse_options verbose && shift ;;
             minimal-build) parse_options minimal-build && shift ;;
+            rtc-build) parse_options rtc-build && shift ;;
+            log-quiet) parse_options log-quiet && shift ;;
             asm | bindir | cc | cxx | gen | jobs | pgo-dir | pgo-videos | prefix | sanitizer | target_system | android-ndk)
                 parse_equal_option "$1" "$2"
                 case $1 in
@@ -512,6 +520,8 @@ else
             toolchain=*) parse_options toolchain="${1#*=}" && shift ;;
             verbose) parse_options verbose && shift ;;
             minimal-build) parse_options minimal-build && shift ;;
+            rtc-build) parse_options rtc-build && shift ;;
+            log-quiet) parse_options log-quiet && shift ;;
             end) ${IN_SCRIPT:-false} && exit ;;
             *) die "Error, unknown option: $1" ;;
             esac

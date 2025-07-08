@@ -132,6 +132,7 @@ static void av1_make_masked_scaled_inter_predictor(uint8_t *src_ptr, uint8_t *sr
     conv_params->dst_stride       = tmp_buf_stride;
     assert(conv_params->do_average == 0);
 
+#if CONFIG_ENABLE_HIGH_BIT_DEPTH
     if (bitdepth > EB_EIGHT_BIT || is_16bit) {
         // for super-res, the reference frame block might be 2x than predictor in maximum
         // for reference scaling, it might be 4x since both width and height is scaled 2x
@@ -179,7 +180,9 @@ static void av1_make_masked_scaled_inter_predictor(uint8_t *src_ptr, uint8_t *sr
                                    interp_filters,
                                    use_intrabc,
                                    bitdepth);
-    } else {
+    } else
+#endif
+    {
         svt_inter_predictor(src_ptr,
                             src_stride,
                             dst_ptr,
@@ -660,10 +663,14 @@ void model_rd_for_sb_with_curvfit(PictureControlSet *pcs, ModeDecisionContext *c
         const BlockSize plane_bsize = get_plane_block_size(bsize, subsampling, subsampling);
         int64_t         dist, sse;
         int             rate;
-        if (ctx->hbd_md) // CCODE
+#if CONFIG_ENABLE_HIGH_BIT_DEPTH
+        if (ctx->hbd_md) {
             sse = svt_aom_highbd_sse(src_buf, src_stride, pred_buf, pred_stride, bw, bh);
-        else
+        } else
+#endif
+        {
             sse = svt_aom_sse(src_buf, src_stride, pred_buf, pred_stride, bw, bh);
+        }
 
         sse = ROUND_POWER_OF_TWO(sse, bd_round);
         model_rd_with_curvfit(pcs, plane_bsize, sse, bw * bh, &rate, &dist, ctx, full_lambda);
@@ -2150,6 +2157,7 @@ static void av1_make_masked_warp_inter_predictor(uint8_t *src_ptr, uint8_t *src_
 //  error(x, y) =
 //    wsrc(x, y) - mask(x, y) * P(x, y) / (AOM_BLEND_A64_MAX_ALPHA ** 2)
 //
+#if CONFIG_ENABLE_OBMC
 #if OPT_OBMC
 void calc_target_weighted_pred(PictureControlSet *pcs, ModeDecisionContext *ctx, const AV1_COMMON *cm,
                                const MacroBlockD *xd, int mi_row, int mi_col, const uint8_t *above, int above_stride,
@@ -2328,6 +2336,7 @@ void svt_aom_precompute_obmc_data(PictureControlSet *pcs, ModeDecisionContext *c
                               dst_stride2[0]);
 #endif
 }
+#endif // CONFIG_ENABLE_OBMC
 
 #if !CLN_MERGE_WM_INTER_PRED
 static void chroma_plane_warped_motion_prediction_sub8x8(PictureControlSet *pcs, uint8_t compound_idx,
@@ -3511,6 +3520,7 @@ static void inter_intra_prediction(PictureControlSet *pcs, EbPictureBufferDesc *
         TxSize tx_size        = blk_geom->txsize[0]; // Nader - Intra 128x128 not supported
         TxSize tx_size_Chroma = blk_geom->txsize_uv[0]; //Nader - Intra 128x128 not supported
 
+#if CONFIG_ENABLE_HIGH_BIT_DEPTH
         if (is16bit) {
 #if OPT_II_PRECOMPUTE
             if (!use_precomputed_intra || plane) {
@@ -3559,11 +3569,13 @@ static void inter_intra_prediction(PictureControlSet *pcs, EbPictureBufferDesc *
                 use_precomputed_intra && !plane ? ctx->intrapred_buf[interintra_mode] : intra_pred, // Intra pred buff
                 use_precomputed_intra && !plane ? blk_geom->bwidth : intra_stride, // Intra pred stride
 #else
-                intra_pred, // Intra pred buff
-                intra_stride, // Intra pred stride
+                    intra_pred, // Intra pred buff
+                    intra_stride, // Intra pred stride
 #endif
                 bit_depth);
-        } else {
+        } else
+#endif
+        {
 #if OPT_II_PRECOMPUTE
             if (!use_precomputed_intra || plane) {
 #endif
@@ -5343,6 +5355,7 @@ void av1_inter_prediction_light_pd1(SequenceControlSet *scs, MvUnit *mv_unit, ui
     }
 }
 
+#if CONFIG_ENABLE_OBMC
 static void av1_inter_prediction_obmc(PictureControlSet *pcs, BlkStruct *blk_ptr, uint8_t use_precomputed_obmc,
                                       struct ModeDecisionContext *ctx, uint16_t pu_origin_x, uint16_t pu_origin_y,
                                       EbPictureBufferDesc *pred_pic, uint16_t dst_origin_x, uint16_t dst_origin_y,
@@ -5453,6 +5466,7 @@ static void av1_inter_prediction_obmc(PictureControlSet *pcs, BlkStruct *blk_ptr
                                     dst_stride2,
                                     is16bit); // is16bit
 }
+#endif // CONFIG_ENABLE_OBMC
 
 #if CLN_INTER_PRED_FUNC
 // special treatment for chroma in 4XN/NX4 blocks if one of the neighbour blocks of the parent square is
@@ -6296,6 +6310,7 @@ EbErrorType svt_aom_inter_prediction(SequenceControlSet *scs, PictureControlSet 
                                is16bit);
     }
 
+#if CONFIG_ENABLE_OBMC
     if (block_mi->motion_mode == OBMC_CAUSAL) {
         assert(is_compound == 0);
         assert(blk_geom->bwidth > 4 && blk_geom->bheight > 4);
@@ -6312,6 +6327,7 @@ EbErrorType svt_aom_inter_prediction(SequenceControlSet *scs, PictureControlSet 
                                   bit_depth,
                                   is_16bit_pipeline);
     }
+#endif
 
     return EB_ErrorNone;
 }
@@ -6629,6 +6645,7 @@ EbErrorType svt_aom_inter_prediction(SequenceControlSet *scs, PictureControlSet 
                                is16bit);
     }
 
+#if CONFIG_ENABLE_OBMC
     if (motion_mode == OBMC_CAUSAL) {
         assert(is_compound == 0);
         assert(blk_geom->bwidth > 4 && blk_geom->bheight > 4);
@@ -6645,6 +6662,7 @@ EbErrorType svt_aom_inter_prediction(SequenceControlSet *scs, PictureControlSet 
                                   bit_depth,
                                   is_16bit_pipeline);
     }
+#endif
 
     return return_error;
 }
@@ -7139,6 +7157,7 @@ EbErrorType svt_aom_inter_prediction(SequenceControlSet *scs, PictureControlSet 
                                is16bit);
     }
 
+#if CONFIG_ENABLE_OBMC
     if (motion_mode == OBMC_CAUSAL) {
         assert(is_compound == 0);
         assert(blk_geom->bwidth > 4 && blk_geom->bheight > 4);
@@ -7155,6 +7174,7 @@ EbErrorType svt_aom_inter_prediction(SequenceControlSet *scs, PictureControlSet 
                                   bit_depth,
                                   is_16bit_pipeline);
     }
+#endif
 
     return return_error;
 }
@@ -8435,6 +8455,7 @@ EbErrorType svt_aom_inter_pu_prediction_av1_obmc(uint8_t hbd_md, ModeDecisionCon
         : PICTURE_BUFFER_DESC_FULL_MASK;
 #endif
 
+#if CONFIG_ENABLE_OBMC
     av1_inter_prediction_obmc(
         pcs,
         ctx->blk_ptr,
@@ -8449,6 +8470,7 @@ EbErrorType svt_aom_inter_pu_prediction_av1_obmc(uint8_t hbd_md, ModeDecisionCon
         component_mask,
         hbd_md ? EB_TEN_BIT : EB_EIGHT_BIT,
         0); // is_16bit_pipeline
+#endif
 
     return return_error;
 }

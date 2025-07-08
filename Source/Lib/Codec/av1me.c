@@ -30,13 +30,20 @@ int svt_av1_refining_search_sad(IntraBcContext *x, MV *ref_mv, int error_per_bit
 AomVarianceFnPtr svt_aom_mefn_ptr[BlockSizeS_ALL];
 
 void init_fn_ptr(void) {
+#if CONFIG_ENABLE_HIGH_BIT_DEPTH
 #define BFP0(BT, SDF, VF, VF_HBD_10, SVF, SDX4DF) \
     svt_aom_mefn_ptr[BT].sdf       = SDF;         \
     svt_aom_mefn_ptr[BT].vf        = VF;          \
     svt_aom_mefn_ptr[BT].vf_hbd_10 = VF_HBD_10;   \
     svt_aom_mefn_ptr[BT].svf       = SVF;         \
     svt_aom_mefn_ptr[BT].sdx4df    = SDX4DF;
-
+#else
+#define BFP0(BT, SDF, VF, VF_HBD_10, SVF, SDX4DF) \
+    svt_aom_mefn_ptr[BT].sdf    = SDF;            \
+    svt_aom_mefn_ptr[BT].vf     = VF;             \
+    svt_aom_mefn_ptr[BT].svf    = SVF;            \
+    svt_aom_mefn_ptr[BT].sdx4df = SDX4DF;
+#endif
     BFP0(BLOCK_4X16,
          svt_aom_sad4x16,
          svt_aom_variance4x16,
@@ -169,6 +176,7 @@ void init_fn_ptr(void) {
          svt_aom_highbd_10_variance4x4,
          svt_aom_sub_pixel_variance4x4,
          svt_aom_sad4x4x4d)
+#if CONFIG_ENABLE_OBMC
 #define OBFP(BT, OSDF, OVF, OSVF)     \
     svt_aom_mefn_ptr[BT].osdf = OSDF; \
     svt_aom_mefn_ptr[BT].ovf  = OVF;  \
@@ -195,6 +203,7 @@ void init_fn_ptr(void) {
     OBFP(BLOCK_32X8, svt_aom_obmc_sad32x8, svt_aom_obmc_variance32x8, svt_aom_obmc_sub_pixel_variance32x8)
     OBFP(BLOCK_16X64, svt_aom_obmc_sad16x64, svt_aom_obmc_variance16x64, svt_aom_obmc_sub_pixel_variance16x64)
     OBFP(BLOCK_64X16, svt_aom_obmc_sad64x16, svt_aom_obmc_variance64x16, svt_aom_obmc_sub_pixel_variance64x16)
+#endif
 }
 
 #if CLN_UNIFY_MV_TYPE

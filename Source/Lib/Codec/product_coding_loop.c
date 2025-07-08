@@ -5483,7 +5483,9 @@ static EbErrorType av1_intra_luma_prediction(ModeDecisionContext *ctx, PictureCo
             ctx->blk_geom
                 ->tx_org_y[is_inter][ctx->tx_depth][ctx->txb_itr], // uint32_t cuOrgY used only for prediction Ptr
             &pcs->scs->seq_header);
-    } else {
+    }
+#if CONFIG_ENABLE_HIGH_BIT_DEPTH
+    else {
         uint16_t top_neigh_array[64 * 2 + 1];
         uint16_t left_neigh_array[64 * 2 + 1];
 
@@ -5566,6 +5568,7 @@ static EbErrorType av1_intra_luma_prediction(ModeDecisionContext *ctx, PictureCo
                 ->tx_org_y[is_inter][ctx->tx_depth][ctx->txb_itr], // uint32_t cuOrgY used only for prediction Ptr
             &pcs->scs->seq_header);
     }
+#endif
 
     return return_error;
 }
@@ -8411,6 +8414,7 @@ static INLINE void opt_non_translation_motion_mode(PictureControlSet *pcs, ModeD
 #endif
         const uint8_t default_drl_idx = cand->drl_index;
 
+#if CONFIG_ENABLE_OBMC
 #if CLN_MV_IDX
         uint8_t motion_mode_valid = svt_aom_obmc_motion_refinement(pcs, ctx, cand, ctx->obmc_ctrls.refine_level);
 #else
@@ -8434,7 +8438,9 @@ static INLINE void opt_non_translation_motion_mode(PictureControlSet *pcs, ModeD
                 cand_bf->valid_pred = 0;
 #endif
             }
-        } else {
+        } else
+#endif // CONFIG_ENABLE_OBMC
+        {
             // If refined mode was not valid, reset the original settings to proceed with processing the candidate
 #if CLN_MV_IDX
             cand->block_mi.mv[0].as_int = default_mv.as_int;

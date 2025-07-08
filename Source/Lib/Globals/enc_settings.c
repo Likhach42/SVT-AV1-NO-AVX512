@@ -25,6 +25,7 @@
 #include "enc_settings.h"
 
 #include "svt_log.h"
+#include "utility.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -1074,6 +1075,7 @@ EbErrorType svt_av1_set_default_params(EbSvtAv1EncConfiguration *config_ptr) {
     config_ptr->avif                              = false;
     return return_error;
 }
+
 static const char *tier_to_str(unsigned in) {
     if (!in)
         return "(auto)";
@@ -1096,9 +1098,9 @@ void svt_av1_print_lib_params(SequenceControlSet *scs) {
     EbSvtAv1EncConfiguration *config = &scs->static_config;
 
     SVT_INFO("-------------------------------------------\n");
-    if (config->pass == ENC_FIRST_PASS)
+    if (config->pass == ENC_FIRST_PASS) {
         SVT_INFO("SVT [config]: preset \t\t\t\t\t\t\t: Pass 1\n");
-    else {
+    } else {
         SVT_INFO("SVT [config]: %s\ttier %s\tlevel %s\n",
                  config->profile == MAIN_PROFILE               ? "main profile"
                      : config->profile == HIGH_PROFILE         ? "high profile"
@@ -1155,7 +1157,7 @@ void svt_av1_print_lib_params(SequenceControlSet *scs) {
         } else {
             switch (config->rate_control_mode) {
             case SVT_AV1_RC_MODE_CQP_OR_CRF:
-                if (config->max_bit_rate)
+                if (config->max_bit_rate) {
                     SVT_INFO(
                         "SVT [config]: BRC mode / %s / max bitrate (kbps)\t\t\t: %s / %d / "
                         "%d\n",
@@ -1163,11 +1165,12 @@ void svt_av1_print_lib_params(SequenceControlSet *scs) {
                         scs->tpl || scs->static_config.enable_variance_boost ? "capped CRF" : "CQP",
                         scs->static_config.qp,
                         (int)config->max_bit_rate / 1000);
-                else
+                } else {
                     SVT_INFO("SVT [config]: BRC mode / %s \t\t\t\t\t: %s / %d \n",
                              scs->tpl || scs->static_config.enable_variance_boost ? "rate factor" : "CQP Assignment",
                              scs->tpl || scs->static_config.enable_variance_boost ? "CRF" : "CQP",
                              scs->static_config.qp);
+                }
                 break;
             case SVT_AV1_RC_MODE_VBR:
                 SVT_INFO("SVT [config]: BRC mode / target bitrate (kbps)\t\t\t\t: VBR / %d \n",
